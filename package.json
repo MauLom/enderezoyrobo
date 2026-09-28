@@ -15,14 +15,18 @@
     "sync:catalogo": "tsx --env-file-if-exists=.env.local scripts/sync-catalog.ts",
     "db:start": "mkdir -p supabase/snippets && supabase start -x edge-runtime,logflare,vector,imgproxy,realtime,storage-api,supavisor",
     "db:stop": "supabase stop",
-    "db:reset": "supabase db reset"
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > src/supabase/database.types.ts"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.20.6",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.2",
     "next": "16.3.6",
     "postgres": "^3.4.9",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

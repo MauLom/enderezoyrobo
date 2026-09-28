@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     ".wrangler/**",
     "build/**",
     "next-env.d.ts",
+    // Tipos generados por `npm run db:types`.
+    "src/supabase/database.types.ts",
   ]),
 ]);
 

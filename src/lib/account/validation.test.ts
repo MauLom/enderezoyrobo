@@ -1,0 +1,36 @@
+import { describe, expect, it } from "vitest";
+import { validateDisplayName, validateEmail, validateOtp } from "./validation";
+
+describe("validateEmail", () => {
+  it("normaliza espacios y mayúsculas", () => {
+    expect(validateEmail("  Jugador@Correo.MX ")).toEqual({ ok: true, value: "jugador@correo.mx" });
+  });
+
+  it("rechaza correos incompletos", () => {
+    expect(validateEmail("jugador@correo").ok).toBe(false);
+    expect(validateEmail("").ok).toBe(false);
+  });
+});
+
+describe("validateOtp", () => {
+  it("acepta 6 dígitos aunque vengan con espacios o guion", () => {
+    expect(validateOtp("123 456")).toEqual({ ok: true, value: "123456" });
+    expect(validateOtp("123-456")).toEqual({ ok: true, value: "123456" });
+  });
+
+  it("rechaza códigos de otro largo o con letras", () => {
+    expect(validateOtp("12345").ok).toBe(false);
+    expect(validateOtp("12345a").ok).toBe(false);
+  });
+});
+
+describe("validateDisplayName", () => {
+  it("recorta y colapsa espacios", () => {
+    expect(validateDisplayName("  Tienda   del   Centro ")).toEqual({ ok: true, value: "Tienda del Centro" });
+  });
+
+  it("rechaza nombres muy cortos o muy largos", () => {
+    expect(validateDisplayName("a").ok).toBe(false);
+    expect(validateDisplayName("x".repeat(41)).ok).toBe(false);
+  });
+});
