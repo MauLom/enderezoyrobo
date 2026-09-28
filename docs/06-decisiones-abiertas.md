@@ -22,9 +22,11 @@ Otros candidatos (disponibilidad revisada con `whois` el 2026-09-28, sin confirm
 - Opción A: plan Tienda gratis 3 meses, luego $199 MXN/mes de por vida.
 - Opción B: cobrar desde el mes 1 con descuento.
 
-## Stack (propuesta, no decidido)
+## Stack (decidido el 2026-09-28)
 
-- Next.js (App Router) + TypeScript, igual que otros proyectos del autor.
-- Supabase: Postgres + auth + storage en el plan gratuito.
-- Hosting en Vercel o Cloudflare Pages (plan gratuito).
-- Job diario (cron de Vercel o GitHub Actions) para sincronizar catálogo y precios.
+- Next.js (App Router) + TypeScript.
+- Supabase: Postgres + auth + storage en el plan gratuito. Migraciones en `supabase/migrations/`.
+- Hosting en Cloudflare Workers vía OpenNext (`@opennextjs/cloudflare`). Se descartó Vercel porque su plan Hobby no permite uso comercial y en diciembre empezamos a cobrar.
+- Sin R2 ni Cloudflare Images: R2 pide tarjeta registrada y las imágenes de cartas se sirven desde Scryfall.
+- Sincronización diaria de catálogo y precios en GitHub Actions: los bulk de Scryfall y MTGJSON son demasiado grandes para una función serverless.
+- Solo se guarda el último precio por carta, fuente y acabado (sin historial), para no pasar de los 500 MB del plan gratuito de Supabase.

@@ -1,0 +1,48 @@
+{
+  "name": "mazotcg",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "next typegen && tsc --noEmit",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "sync:catalogo": "tsx --env-file-if-exists=.env.local scripts/sync-catalog.ts",
+    "db:start": "mkdir -p supabase/snippets && supabase start -x edge-runtime,logflare,vector,imgproxy,realtime,storage-api,supavisor",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.6",
+    "next": "16.3.6",
+    "postgres": "^3.4.9",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^24.19.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "esbuild": "^0.28.2",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "supabase": "^2.118.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.2",
+    "wrangler": "^4.143.0"
+  },
+  "allowScripts": {
+    "unrs-resolver@1.12.2": true,
+    "workerd@1.20260926.1": true,
+    "esbuild@0.28.1": true,
+    "esbuild@0.25.4": true
+  }
+}

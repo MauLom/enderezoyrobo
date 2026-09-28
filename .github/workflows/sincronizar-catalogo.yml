@@ -1,0 +1,30 @@
+# Sincroniza catálogo y precios de Scryfall y el tipo de cambio de Banxico.
+# Scryfall publica su bulk diario alrededor de las 09:00 UTC.
+name: Sincronizar catálogo
+
+on:
+  schedule:
+    - cron: "30 10 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sincronizar-catalogo
+  cancel-in-progress: false
+
+jobs:
+  sincronizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run sync:catalogo
+        env:
+          # Cadena del "Session pooler" de Supabase: la conexión directa es solo IPv6
+          # y los runners de GitHub no tienen IPv6.
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          BANXICO_TOKEN: ${{ secrets.BANXICO_TOKEN }}

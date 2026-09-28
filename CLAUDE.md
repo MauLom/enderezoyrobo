@@ -14,4 +14,10 @@ Lee `docs/` antes de proponer cambios de alcance. Resumen de lo que no se negoci
 
 - UI, documentación y mensajes de commit en español.
 - Precios mostrados en MXN; guardar también el valor original y su moneda.
-- Todavía no hay stack elegido; la propuesta está en `docs/06-decisiones-abiertas.md`.
+- Stack: Next.js + TypeScript en Cloudflare Workers (OpenNext) y Supabase. Detalle y razones en `docs/06-decisiones-abiertas.md`.
+- La lógica de dominio (parsers, matching) vive en `src/lib/` como TypeScript puro con pruebas en vitest; no debe depender de Next ni de Supabase.
+- Los jobs (sincronización de catálogo) viven en `scripts/`, corren con `tsx` y solo hacen E/S; la conversión de datos va en `src/lib/`.
+- Montos en MXN como enteros en centavos (`*_mxn_cents`).
+- Antes de dar algo por terminado: `npm test`, `npm run lint` y `npm run typecheck`.
+
+@AGENTS.md

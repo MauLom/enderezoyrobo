@@ -7,7 +7,7 @@ Con capas gratuitas, el MVP cuesta unos $20–40 MXN al mes. El primer salto rea
 | Concepto | Opción | Fase MVP (MXN/mes) | Al crecer (MXN/mes) |
 | --- | --- | --- | --- |
 | Dominio | .com o .mx | ~$25 (anual prorrateado) | ~$25 |
-| Frontend + API | Vercel o Cloudflare Pages (gratis) | $0 | $0–380 |
+| Frontend + API | Cloudflare Workers vía OpenNext (gratis) | $0 | $0–380 |
 | Base de datos + auth | Supabase (gratis) | $0 | ~$460 (Pro, 25 USD) |
 | Catálogo y precios | Scryfall API + MTGJSON | $0 | $0 |
 | Correo transaccional | Resend (gratis) | $0 | $0–380 |
