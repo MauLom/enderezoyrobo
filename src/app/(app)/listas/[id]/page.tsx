@@ -3,14 +3,18 @@ import { notFound } from "next/navigation";
 import { Icon } from "@/app/_components/icon";
 import { PageHeader } from "@/app/_components/page-header";
 import { ui } from "@/app/ui";
+import Link from "next/link";
 import { CONDITIONS } from "@/lib/cards/condition";
+import { draftOffer, STATUS_LABEL } from "@/lib/offers/offers";
 import { formatForeign, formatMxn, toMxnCents } from "@/lib/pricing/mxn";
 import { getDealContacts } from "@/supabase/contacts";
+import { getMyOffersOnList } from "@/supabase/offers";
 import { getCurrentProfile } from "@/supabase/session";
 import { getWantListDetail, type WantListItemView } from "@/supabase/want-lists";
 import { deleteItem, deleteList, renameList, setListPublic, updateItem } from "../actions";
 import { CopyLink } from "./copy-link";
-import { computeMatching } from "./matching";
+import { computeMatching, toInventoryItems, toWantItems } from "./matching";
+import { type OfferLine, OfferForm } from "./offer-form";
 import { StoreResult } from "./store-result";
 
 export async function generateMetadata({ params }: PageProps<"/listas/[id]">): Promise<Metadata> {
@@ -31,6 +35,25 @@ export default async function ListaPage({ params }: PageProps<"/listas/[id]">) {
   const isOwner = profile?.id === list.ownerId;
   // Sin sesión (lista pública) solo se ven los WhatsApp de las tiendas.
   const matching = computeMatching(list, profile ? await getDealContacts() : new Map());
+  // Ofertar: solo en listas públicas ajenas y con sesión.
+  const canOffer = profile !== null && !isOwner && list.isPublic;
+  const myOffers = canOffer && profile.kind !== "player" ? await getMyOffersOnList(list.id, profile.id) : [];
+  const pendingOffer = myOffers.find((o) => o.status === "pending");
+  const offerLines: OfferLine[] = [];
+  if (canOffer && profile.kind !== "player" && !pendingOffer) {
+    const mine = toInventoryItems(list.inventory.filter((r) => r.sellerId === profile.id));
+    const { lines } = draftOffer(toWantItems(list), mine);
+    for (const line of lines) {
+      const item = list.items.find((i) => i.id === line.wantItemId)!;
+      offerLines.push({
+        wantItemId: line.wantItemId,
+        name: item.name,
+        detail: `${item.minCondition} o mejor${item.foil === "yes" ? ", foil" : ""}${item.language ? `, ${item.language.toUpperCase()}` : ""}`,
+        requested: line.requested,
+        unitPricesMxnCents: line.unitPricesMxnCents,
+      });
+    }
+  }
   const cardCount = list.items.reduce((sum, i) => sum + i.quantity, 0);
   const best = matching.best;
 
@@ -64,6 +87,38 @@ export default async function ListaPage({ params }: PageProps<"/listas/[id]">) {
       </PageHeader>
 
       <div className={ui.page}>
+        {canOffer && (
+          <section className={`${ui.card} flex flex-col gap-4`}>
+            <div>
+              <h2 className={ui.h2}>Ofertar por el lote</h2>
+              <p className={ui.muted}>Propón a {list.ownerName} un precio por las cartas que puedes surtir.</p>
+            </div>
+            {profile.kind === "player" ? (
+              <p className={ui.muted}>
+                Para hacer ofertas, cambia tu cuenta a vendedor en{" "}
+                <Link href="/cuenta" className={ui.link}>
+                  Mi cuenta
+                </Link>
+                .
+              </p>
+            ) : pendingOffer ? (
+              <p className="text-sm">
+                Enviaste una oferta de <strong className="text-accent-soft">{formatMxn(pendingOffer.totalMxnCents)}</strong>{" "}
+                <span className={ui.badgeWarn}>{STATUS_LABEL.pending}</span>
+                <span className={`${ui.muted} mt-1 block`}>{list.ownerName} puede aceptarla o rechazarla.</span>
+              </p>
+            ) : (
+              <>
+                {myOffers[0] && (
+                  <p className={ui.muted}>
+                    Tu última oferta ({formatMxn(myOffers[0].totalMxnCents)}) fue {STATUS_LABEL[myOffers[0].status].toLowerCase()}.
+                  </p>
+                )}
+                <OfferForm listId={list.id} lines={offerLines} />
+              </>
+            )}
+          </section>
+        )}
         <section className="flex flex-col gap-4">
           <div className="section-heading">
             <div>
