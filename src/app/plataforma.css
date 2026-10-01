@@ -53,6 +53,7 @@
 .avatar { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #dbece2; color: var(--green-deep); font-size: 10px; font-weight: 800; }
 .user-row strong, .user-row span { display: block; font-size: 10px; }
 .user-row span { margin-top: 2px; color: var(--muted); }
+.user-row .user-kind { color: var(--green); font-weight: 700; }
 .user-row .more { letter-spacing: 1px; color: #8b928e; }
 .main-content { min-height: calc(100vh - 72px); padding: 43px 36px 60px; background: var(--canvas); }
 .welcome { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 14px; padding-bottom: 28px; }
