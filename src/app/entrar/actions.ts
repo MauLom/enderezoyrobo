@@ -1,7 +1,9 @@
 "use server";
 
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
-import { validateEmail, validateOtp } from "@/lib/account/validation";
+import { safeNextPath, validateEmail, validateOtp } from "@/lib/account/validation";
+import { createAdminClient, devLoginEnabled } from "@/supabase/admin";
 import { createClient } from "@/supabase/server";
 
 export type LoginState =
@@ -29,7 +31,11 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
 
     const { error } = await supabase.auth.verifyOtp({ email: email.value, token: code.value, type: "email" });
     if (error) return { step: "code", email: email.value, error: "El código no es válido o ya venció." };
+<<<<<<< HEAD
     redirect("/dashboard");
+=======
+    redirect(safeNextPath(formData.get("next")));
+>>>>>>> daeac65 (quack)
   }
 
   const { error } = await supabase.auth.signInWithOtp({ email: email.value, options: { shouldCreateUser: true } });
@@ -39,9 +45,35 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
       email: email.value,
       error:
         error.status === 429
-          ? "Pediste muchos códigos seguidos. Espera un momento y vuelve a intentar."
+          ? "Se alcanzó el límite de correos por ahora. Espera unos minutos y vuelve a intentar."
           : "No pudimos mandar el código. Intenta de nuevo.",
     };
   }
   return { step: "code", email: email.value };
+}
+
+export type DevLoginState = { error?: string };
+
+/**
+ * Entrar sin correo, solo en desarrollo: genera el token con la llave secreta
+ * (sin mandar correo ni gastar el límite de envíos) y abre la sesión con él.
+ * Crea la cuenta si no existe.
+ */
+export async function devLogin(_prev: DevLoginState, formData: FormData): Promise<DevLoginState> {
+  if (!devLoginEnabled()) return { error: "El acceso de desarrollo no está disponible." };
+
+  const email = validateEmail(String(formData.get("email") ?? ""));
+  if (!email.ok) return { error: email.error };
+
+  // Si la cuenta no existe, generateLink la crea y el token es de tipo "signup"
+  // en vez de "magiclink"; por eso se verifica con el tipo que devuelve.
+  const admin = createAdminClient();
+  const link = await admin.auth.admin.generateLink({ type: "magiclink", email: email.value });
+  if (link.error) return { error: `No se pudo generar el acceso: ${link.error.message}` };
+  const { hashed_token: tokenHash, verification_type: type } = link.data.properties;
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: type as EmailOtpType });
+  if (error) return { error: `No se pudo abrir la sesión: ${error.message}` };
+  redirect(safeNextPath(formData.get("next")));
 }

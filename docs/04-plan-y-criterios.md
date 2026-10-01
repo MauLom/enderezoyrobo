@@ -8,6 +8,8 @@ El proyecto sigue después del **4 de enero de 2027** solo si hay tiendas activa
 | 2. Piloto con tiendas | Noviembre 2026 | 5 tiendas suben su CSV; 20–30 jugadores prueban; ajustar según el uso real |
 | 3. Abrir y cobrar | Diciembre 2026 | Listas públicas y ofertas; activar planes de pago; difundir en grupos de Monterrey |
 
+**Avance al 2026-09-29:** la fase 1 va adelantada. El flujo del comprador (want list → matching → pedido por WhatsApp) ya funciona con datos de prueba. Lo que falta para poder arrancar el piloto de noviembre es que las tiendas puedan registrarse y subir su CSV; el detalle está en [03 - MVP](03-mvp.md#estado-2026-09-29).
+
 **Revisión a fin de octubre:** si menos de 3 tiendas entregaron su inventario, frenar antes de invertir más tiempo.
 
 ## Criterios de go/no-go (4 de enero de 2027)

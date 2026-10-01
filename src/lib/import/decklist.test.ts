@@ -36,7 +36,7 @@ describe("parseDecklist", () => {
       "Name Mi mazo",
       "",
       "Commander",
-      "1 Atraxa, Praetors' Voice (2X2) 190",
+      "1 Atraxa, Praetors' Voice (2XM) 190",
       "",
       "// rampa",
       "Deck",

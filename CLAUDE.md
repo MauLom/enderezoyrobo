@@ -18,6 +18,7 @@ Lee `docs/` antes de proponer cambios de alcance. Resumen de lo que no se negoci
 - La lógica de dominio (parsers, matching) vive en `src/lib/` como TypeScript puro con pruebas en vitest; no debe depender de Next ni de Supabase.
 - El acceso a Supabase desde la app vive en `src/supabase/`. Las páginas con datos del usuario llaman a `requireProfile()`; el proxy solo hace una revisión optimista. Tras cambiar el esquema, corre `npm run db:types`.
 - Los jobs (sincronización de catálogo) viven en `scripts/`, corren con `tsx` y solo hacen E/S; la conversión de datos va en `src/lib/`.
+- Datos de prueba: `npm run seed` (usuarios `@mazo.test`, casos en `docs/08-validacion.md`). Si una pantalla nueva necesita otro caso, agrégalo al seed y a esa tabla.
 - Montos en MXN como enteros en centavos (`*_mxn_cents`).
 - Antes de dar algo por terminado: `npm test`, `npm run lint` y `npm run typecheck`.
 

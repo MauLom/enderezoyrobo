@@ -2,16 +2,27 @@ import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/supabase/proxy";
 
 // Rutas que requieren sesión. Es una revisión optimista: cada página vuelve a
+<<<<<<< HEAD
 // verificar con requireProfile, y RLS protege los datos.
 const PROTECTED = ["/cuenta", "/mainpage"];
 
+=======
+// verificar con requireProfile, y RLS protege los datos. /listas/[id] no está:
+// las listas públicas se ven sin sesión.
+const PROTECTED_PREFIXES = ["/cuenta"];
+const PROTECTED_EXACT = ["/listas", "/listas/nueva"];
+>>>>>>> daeac65 (quack)
 
 export async function proxy(request: NextRequest) {
   const { response, userId } = await updateSession(request);
   const path = request.nextUrl.pathname;
 
-  if (!userId && PROTECTED.some((p) => path === p || path.startsWith(`${p}/`))) {
-    return NextResponse.redirect(new URL("/entrar", request.url));
+  const isProtected =
+    PROTECTED_EXACT.includes(path) || PROTECTED_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`));
+  if (!userId && isProtected) {
+    const login = new URL("/entrar", request.url);
+    login.searchParams.set("siguiente", path);
+    return NextResponse.redirect(login);
   }
   return response;
 }

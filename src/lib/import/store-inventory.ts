@@ -1,5 +1,6 @@
 import { type Condition, parseCondition } from "@/lib/cards/condition";
 import { normalizeHeader, parseCsv } from "@/lib/import/csv";
+import { parseMxnCents } from "@/lib/pricing/mxn";
 
 /**
  * Plantilla de inventario para tiendas:
@@ -127,7 +128,7 @@ export function parseStoreInventory(csvText: string): InventoryResult {
     const quantity = parseQuantity(get("quantity"));
     if (quantity === null) return fail(`Cantidad inválida: "${get("quantity")}"`);
 
-    const priceMxnCents = parsePriceCents(get("price"));
+    const priceMxnCents = parseMxnCents(get("price"));
     if (priceMxnCents === null) return fail(`Precio inválido: "${get("price")}"`);
 
     let condition: Condition = "NM";
@@ -180,10 +181,3 @@ function parseQuantity(raw: string): number | null {
   return Number(raw);
 }
 
-/** Acepta "45", "$1,234.50" y "1234.5 MXN". Usa punto decimal, como en México. */
-function parsePriceCents(raw: string): number | null {
-  const cleaned = raw.replace(/mxn|\$|\s/gi, "").replace(/,(?=\d{3}(\D|$))/g, "");
-  if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return null;
-  const [pesos, cents = ""] = cleaned.split(".");
-  return Number(pesos) * 100 + Number(cents.padEnd(2, "0"));
-}

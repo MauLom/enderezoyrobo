@@ -1,3 +1,4 @@
+
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
@@ -75,13 +76,13 @@ isOneToOne: false
                   ]
                 },"offer": {
                   Row: {
-                    "created_at": string,"id": string,"message": string | null,"seller_id": string,"status": Database["public"]['Enums']["offer_status"],"total_mxn_cents": number,"want_list_id": string
+                    "created_at": string,"id": string,"message": string | null,"responded_at": string | null,"seller_id": string,"status": Database["public"]['Enums']["offer_status"],"total_mxn_cents": number,"want_list_id": string
                   }
                   Insert: {
-                    "created_at"?: string,"id"?: string,"message"?: string | null,"seller_id": string,"status"?: Database["public"]['Enums']["offer_status"],"total_mxn_cents": number,"want_list_id": string
+                    "created_at"?: string,"id"?: string,"message"?: string | null,"responded_at"?: string | null,"seller_id": string,"status"?: Database["public"]['Enums']["offer_status"],"total_mxn_cents": number,"want_list_id": string
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"message"?: string | null,"seller_id"?: string,"status"?: Database["public"]['Enums']["offer_status"],"total_mxn_cents"?: number,"want_list_id"?: string
+                    "created_at"?: string,"id"?: string,"message"?: string | null,"responded_at"?: string | null,"seller_id"?: string,"status"?: Database["public"]['Enums']["offer_status"],"total_mxn_cents"?: number,"want_list_id"?: string
                   }
                   Relationships: [
                     {
@@ -144,13 +145,13 @@ isOneToOne: false
                   ]
                 },"profile": {
                   Row: {
-                    "created_at": string,"display_name": string,"id": string,"kind": Database["public"]['Enums']["profile_kind"],"plan": string,"verified": boolean,"whatsapp": string | null
+                    "created_at": string,"display_name": string,"id": string,"kind": Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at": string | null,"plan": string,"verified": boolean,"whatsapp": string | null
                   }
                   Insert: {
-                    "created_at"?: string,"display_name": string,"id": string,"kind"?: Database["public"]['Enums']["profile_kind"],"plan"?: string,"verified"?: boolean,"whatsapp"?: string | null
+                    "created_at"?: string,"display_name": string,"id": string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean,"whatsapp"?: string | null
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["profile_kind"],"plan"?: string,"verified"?: boolean,"whatsapp"?: string | null
+                    "created_at"?: string,"display_name"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean,"whatsapp"?: string | null
                   }
                   Relationships: [
                     
@@ -255,7 +256,43 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "show_limit":
+            "avisos_vendedor":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "listas_nuevas": number,"respuestas": number
+            }[]
+                           },
+"buscar_impresiones":
+{ Args: { "nombres": (string)[] }; Returns: {
+              "collector_number": string,"id": string,"image_uri": string,"lang": string,"name": string,"oracle_id": string,"released_at": string,"set_code": string,"set_name": string
+            }[]
+                           },
+"crear_oferta":
+{ Args: { "items": Json,"lista": string,"mensaje": string,"total": number }; Returns: string
+                           },
+"inventario_cumple":
+{ Args: { "i": Database["public"]['Tables']["inventory_item"]['Row'],"i_oracle_id": string,"w": Database["public"]['Tables']["want_list_item"]['Row'] }; Returns: boolean
+                           },
+"inventario_para":
+{ Args: { "oracle_ids": (string)[] }; Returns: {
+              "card_name": string,"collector_number": string,"condition": Database["public"]['Enums']["card_condition"],"foil": boolean,"id": string,"inventory_updated_at": string,"language": string,"oracle_id": string,"price_mxn_cents": number,"printing_id": string,"quantity": number,"seller_id": string,"seller_kind": Database["public"]['Enums']["profile_kind"],"seller_name": string,"set_code": string,"store_name": string,"store_verified": boolean,"store_whatsapp": string
+            }[]
+                           },
+"mi_inventario_para":
+{ Args: { "oracle_ids": (string)[] }; Returns: {
+              "card_name": string,"collector_number": string,"condition": Database["public"]['Enums']["card_condition"],"foil": boolean,"id": string,"inventory_updated_at": string,"language": string,"oracle_id": string,"price_mxn_cents": number,"printing_id": string,"quantity": number,"seller_id": string,"seller_kind": Database["public"]['Enums']["profile_kind"],"seller_name": string,"set_code": string,"store_name": string,"store_verified": boolean,"store_whatsapp": string
+            }[]
+                           },
+"oportunidades":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "foil": Database["public"]['Enums']["foil_preference"],"item_id": string,"language": string,"list_name": string,"list_updated_at": string,"min_condition": Database["public"]['Enums']["card_condition"],"oracle_id": string,"owner_name": string,"printing_id": string,"quantity": number,"want_list_id": string
+            }[]
+                           },
+"resumen_cartas":
+{ Args: { "oracle_ids": (string)[] }; Returns: {
+              "eur_min": number,"image_uri": string,"name": string,"oracle_id": string,"set_code": string,"usd_min": number
+            }[]
+                           },
+"show_limit":
 { Args: Record<PropertyKey, never>; Returns: number
                            },
 "show_trgm":

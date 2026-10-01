@@ -24,8 +24,10 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
     .from("profile")
     .select("id, display_name, kind")
     .eq("id", userId)
-    .single();
+    .maybeSingle();
   if (error) throw error;
+  // Token válido de un usuario que ya no existe (p. ej., borrado): se trata como sin sesión.
+  if (!data) return null;
 
   return {
     id: data.id,

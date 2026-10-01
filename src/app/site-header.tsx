@@ -6,14 +6,17 @@ export async function SiteHeader() {
 
   return (
     <header className="border-b border-foreground/10">
-      <nav className="mx-auto flex w-full max-w-2xl items-center justify-between px-4 py-3">
+      <nav className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-3">
         <Link href="/" className="font-semibold tracking-tight">
           Mazo
         </Link>
         {profile ? (
-          <Link href="/cuenta" className="text-sm">
-            {profile.displayName}
-          </Link>
+          <div className="flex items-center gap-4 text-sm">
+            <Link href="/listas">Mis listas</Link>
+            <Link href="/cuenta" className="opacity-70">
+              {profile.displayName}
+            </Link>
+          </div>
         ) : (
           <Link href="/entrar" className="text-sm font-medium">
             Entrar

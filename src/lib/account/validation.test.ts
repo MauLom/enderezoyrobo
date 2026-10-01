@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateDisplayName, validateEmail, validateOtp } from "./validation";
+import { safeNextPath, validateDisplayName, validateEmail, validateOtp } from "./validation";
 
 describe("validateEmail", () => {
   it("normaliza espacios y mayúsculas", () => {
@@ -32,5 +32,20 @@ describe("validateDisplayName", () => {
   it("rechaza nombres muy cortos o muy largos", () => {
     expect(validateDisplayName("a").ok).toBe(false);
     expect(validateDisplayName("x".repeat(41)).ok).toBe(false);
+  });
+});
+
+describe("safeNextPath", () => {
+  it("acepta rutas internas", () => {
+    expect(safeNextPath("/listas/nueva")).toBe("/listas/nueva");
+    expect(safeNextPath("/listas?x=1")).toBe("/listas?x=1");
+  });
+
+  it("rechaza rutas externas o vacías", () => {
+    expect(safeNextPath("//evil.com")).toBe("/cuenta");
+    expect(safeNextPath("https://evil.com")).toBe("/cuenta");
+    expect(safeNextPath("/\\evil.com")).toBe("/cuenta");
+    expect(safeNextPath(null)).toBe("/cuenta");
+    expect(safeNextPath("", "/listas")).toBe("/listas");
   });
 });

@@ -23,7 +23,7 @@ describe("parseStoreInventory", () => {
     const csv = [
       "Carta,Set,Número,Condición,Idioma,Foil,Cantidad,Precio",
       "Sol Ring,C21,263,NM,Inglés,No,3,45",
-      '"Atraxa, Praetors\' Voice",2X2,190,Lightly Played,Español,Sí,1,"$1,234.50"',
+      '"Atraxa, Praetors\' Voice",2XM,190,Lightly Played,Español,Sí,1,"$1,234.50"',
     ].join("\n");
     const { rows, errors, warnings } = parseStoreInventory(csv);
     expect(errors).toEqual([]);
@@ -43,7 +43,7 @@ describe("parseStoreInventory", () => {
       {
         rowNumber: 3,
         name: "Atraxa, Praetors' Voice",
-        setCode: "2x2",
+        setCode: "2xm",
         collectorNumber: "190",
         condition: "LP",
         language: "es",

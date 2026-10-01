@@ -7,12 +7,13 @@ const input =
   "w-full rounded-md border border-foreground/20 bg-transparent px-3 py-2 text-base outline-none focus:border-foreground/60";
 const button = "w-full rounded-md bg-foreground px-3 py-2 font-medium text-background disabled:opacity-50";
 
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(login, { step: "email" });
 
   if (state.step === "email") {
     return (
       <form key="email" action={action} className="flex flex-col gap-3">
+        {next && <input type="hidden" name="next" value={next} />}
         <label htmlFor="email" className="text-sm font-medium">
           Correo
         </label>
@@ -41,6 +42,7 @@ export function LoginForm() {
 
   return (
     <form key="code" action={action} className="flex flex-col gap-3">
+      {next && <input type="hidden" name="next" value={next} />}
       <p className="text-sm">
         Mandamos un código a <strong>{state.email}</strong>. Revisa también la carpeta de spam.
       </p>

@@ -22,13 +22,26 @@ Verificar los términos de uso y los límites de cada fuente antes de implementa
 
 ## Formatos de importación
 
-- **Texto estilo Moxfield/Arena:** `1 Sol Ring (C21) 263`; set y número opcionales. Si faltan, se busca por nombre y se acepta cualquier impresión.
-- **CSV de ManaBox y Moxfield:** confirmar las columnas exactas con un export real antes de escribir el parser.
-- **CSV de inventario de tienda:** plantilla propia (carta, set, número, condición, idioma, foil, cantidad, precio MXN).
+- **Texto estilo Moxfield/Arena** (implementado, `src/lib/import/decklist.ts`): `1 Sol Ring (C21) 263`; set y número opcionales. Si faltan, se busca por nombre y se acepta cualquier impresión.
+- **CSV de ManaBox y Moxfield** (pendiente): confirmar las columnas exactas con un export real antes de escribir el parser.
+- **CSV de inventario de tienda** (parser implementado en `src/lib/import/store-inventory.ts`, sin pantalla todavía): plantilla propia en `public/plantilla-inventario.csv` con columnas `carta,set,numero,condicion,idioma,foil,cantidad,precio` (precio en MXN). Acepta encabezados con acentos y mayúsculas, condiciones en abreviatura o completas ("Lightly Played") y precios con `$` y comas.
+
+## Resolución de want lists contra el catálogo
+
+Implementada en `src/lib/catalog/resolve.ts`; la búsqueda en la base la hace `buscar_impresiones`.
+
+- El nombre se compara sin distinguir mayúsculas, con espacios y apóstrofos normalizados. Las cartas de dos caras se encuentran también por la cara frontal ("Delver of Secrets").
+- Con set y número se pide esa impresión exacta. Si no existe, se acepta cualquier impresión y se avisa en la vista previa.
+- Si varias cartas se llaman igual (una carta y su ficha), gana la que tiene más impresiones.
+- Las líneas repetidas de la misma carta se suman. Las que no se encuentran se muestran como problema y no se guardan.
+
+## Precio de referencia mostrado
+
+En el detalle de una lista, cada carta muestra el precio de TCGplayer en USD, no foil, convertido a MXN con el último tipo de cambio de Banxico. Si la carta pide una impresión exacta se usa el de esa impresión; si no, el más bajo entre todas sus impresiones (`resumen_cartas`). Sin tipo de cambio cargado se muestra en dólares. Cardmarket se calcula en la misma consulta pero todavía no se muestra.
 
 ## Modelo de datos
 
-El esquema implementado está en `supabase/migrations/20260928000000_esquema_inicial.sql` y manda sobre este resumen.
+El esquema implementado está en `supabase/migrations/` y manda sobre este resumen. `20260929000000_consultas_want_lists.sql` agrega las funciones que usan las pantallas de listas (`buscar_impresiones`, `resumen_cartas`, `inventario_para`); son *security invoker*, así que respetan RLS.
 
 - `card_printing`: id de Scryfall, oracle id, nombre, set, número, imagen, rareza.
 - `price_reference`: printing, fuente (ck, tcgplayer, cardmarket), moneda, valor, acabado (nonfoil, foil, etched), fecha. Solo el último valor, sin historial.

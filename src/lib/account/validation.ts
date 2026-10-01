@@ -29,3 +29,12 @@ export function validateDisplayName(raw: string): Validated<string> {
   }
   return { ok: true, value: name };
 }
+
+/**
+ * Ruta a la que volver después de entrar. Solo rutas internas ("/listas/…");
+ * cualquier otra cosa ("//sitio.com", "https://…") manda a `fallback`.
+ */
+export function safeNextPath(raw: unknown, fallback = "/cuenta"): string {
+  if (typeof raw !== "string" || !raw.startsWith("/") || raw.startsWith("//") || raw.includes("\\")) return fallback;
+  return raw;
+}

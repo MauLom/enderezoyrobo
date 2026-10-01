@@ -34,7 +34,8 @@ Otros candidatos (disponibilidad revisada con `whois` el 2026-09-28, sin confirm
 ## Autenticación (decidido el 2026-09-28)
 
 - Entrar con código de 6 dígitos por correo (OTP de Supabase), sin contraseña. La primera vez crea la cuenta y un trigger crea el `profile`.
-- Código en lugar de enlace mágico: el enlace falla cuando el correo se abre en otro navegador o en el navegador interno de una app, y el código se escribe en la misma pestaña.
+- El correo trae código y enlace. El código es el camino principal porque se escribe en la misma pestaña; el enlace (`/auth/confirmar`) falla si se abre en otro navegador o en el navegador interno de una app, pero sirve a quien lee el correo en el mismo dispositivo.
+- En desarrollo hay acceso sin correo con la llave secreta (ver `docs/08-validacion.md`). Se descartó un código fijo global para pruebas: si llegara a producción, cualquiera entraría a cualquier cuenta.
 - En producción hace falta SMTP propio (Resend, plan gratuito): el SMTP incluido en Supabase es solo para pruebas y manda muy pocos correos por hora. Las plantillas en español están en `supabase/templates/` y hay que copiarlas al proyecto en la nube.
 - `proxy.ts` refresca la sesión y hace la redirección optimista; cada página vuelve a verificar con `requireProfile` y RLS protege los datos. OpenNext marca el proxy de Node en Cloudflare como experimental; se probó el login completo en `workerd` con `npm run preview` y funcionó.
 - Pendiente: entrar con Google, si los jugadores lo piden.
@@ -42,3 +43,5 @@ Otros candidatos (disponibilidad revisada con `whois` el 2026-09-28, sin confirm
 ## Pendiente: privacidad del WhatsApp
 
 `profile.whatsapp` y `store.whatsapp` son públicos, porque la política de lectura de ambas tablas es `using (true)`. Para una tienda está bien. Para un jugador, su número no debería verse hasta que haya una oferta de por medio. Hay que decidirlo antes de pedir el número en la UI. Por eso `/cuenta` todavía no lo pide.
+
+Consecuencia actual: el botón "Pedir por WhatsApp" solo usa `store.whatsapp`, así que un vendedor sin tienda aparece en el matching con "Este vendedor no tiene WhatsApp registrado" y no hay forma de contactarlo. Hay que resolver esto antes de abrir el plan Vendedor básico.
