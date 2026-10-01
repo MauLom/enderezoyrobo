@@ -51,7 +51,7 @@ El diseño de Figma del marketplace (tema oscuro, acento violeta, barra superior
 - `/dashboard` es la página de inicio con sesión (`HOME_PATH` en `src/lib/account/validation.ts`); la landing manda ahí si ya hay sesión.
 - Comunidad y Mensajes se quedan en el menú como "Pronto", sin contenido. Están fuera del MVP (ver [03](03-mvp.md#marketplace-dashboard)).
 
-##Privacidad del WhatsApp (decidido el 2026-10-01)
+## Privacidad del WhatsApp (decidido el 2026-10-01)
 
 `profile.whatsapp` y `store.whatsapp` son públicos, porque la política de lectura de ambas tablas es `using (true)`. Para una tienda está bien. Para un jugador, su número no debería verse hasta que haya una oferta de por medio. Hay que decidirlo antes de pedir el número en la UI. Por eso `/cuenta` todavía no lo pide.
 
