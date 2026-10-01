@@ -164,13 +164,13 @@ isOneToOne: false
                   ]
                 },"profile": {
                   Row: {
-                    "created_at": string,"display_name": string,"id": string,"kind": Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at": string | null,"plan": string,"verified": boolean
+                    "created_at": string,"delivery_zone": string | null,"display_name": string,"id": string,"kind": Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at": string | null,"plan": string,"verified": boolean
                   }
                   Insert: {
-                    "created_at"?: string,"display_name": string,"id": string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean
+                    "created_at"?: string,"delivery_zone"?: string | null,"display_name": string,"id": string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean
+                    "created_at"?: string,"delivery_zone"?: string | null,"display_name"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean
                   }
                   Relationships: [
                     

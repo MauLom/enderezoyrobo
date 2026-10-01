@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { safeNextPath, validateDisplayName, validateEmail, validateOtp } from "./validation";
+import {
+  safeNextPath,
+  validateDeliveryZone,
+  validateDisplayName,
+  validateEmail,
+  validateOtp,
+  validateWhatsapp,
+} from "./validation";
 
 describe("validateEmail", () => {
   it("normaliza espacios y mayúsculas", () => {
@@ -47,5 +54,35 @@ describe("safeNextPath", () => {
     expect(safeNextPath("/\\evil.com")).toBe("/dashboard");
     expect(safeNextPath(null)).toBe("/dashboard");
     expect(safeNextPath("", "/listas")).toBe("/listas");
+  });
+});
+
+describe("validateWhatsapp", () => {
+  it("normaliza un número de 10 dígitos al formato internacional", () => {
+    expect(validateWhatsapp(" 81 1234 5678 ")).toEqual({ ok: true, value: "+528112345678" });
+    expect(validateWhatsapp("+52 1 81 1234 5678")).toEqual({ ok: true, value: "+528112345678" });
+  });
+
+  it("vacío significa borrar el número", () => {
+    expect(validateWhatsapp("   ")).toEqual({ ok: true, value: null });
+  });
+
+  it("rechaza lo que no es teléfono", () => {
+    expect(validateWhatsapp("12345").ok).toBe(false);
+    expect(validateWhatsapp("mi número").ok).toBe(false);
+  });
+});
+
+describe("validateDeliveryZone", () => {
+  it("acepta municipios de la lista", () => {
+    expect(validateDeliveryZone(" San Pedro Garza García ")).toEqual({ ok: true, value: "San Pedro Garza García" });
+  });
+
+  it("vacío es no indicar zona", () => {
+    expect(validateDeliveryZone("")).toEqual({ ok: true, value: null });
+  });
+
+  it("rechaza lo que no está en la lista", () => {
+    expect(validateDeliveryZone("Saltillo").ok).toBe(false);
   });
 });

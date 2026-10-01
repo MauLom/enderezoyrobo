@@ -8,6 +8,7 @@ export type Profile = {
   email: string | null;
   displayName: string;
   kind: "player" | "seller" | "store";
+  deliveryZone: string | null;
 };
 
 /**
@@ -22,7 +23,7 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
 
   const { data, error } = await supabase
     .from("profile")
-    .select("id, display_name, kind")
+    .select("id, display_name, kind, delivery_zone")
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
@@ -34,6 +35,7 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
     email: typeof auth.claims.email === "string" ? auth.claims.email : null,
     displayName: data.display_name,
     kind: data.kind,
+    deliveryZone: data.delivery_zone,
   };
 });
 
