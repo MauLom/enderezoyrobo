@@ -5,8 +5,9 @@ import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Entrar · Mazo" };
 
+
 export default async function EntrarPage() {
-  if (await getCurrentProfile()) redirect("/cuenta");
+  if (await getCurrentProfile()) redirect("/mainpage");
 
   return (
     <main className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-4 py-16">

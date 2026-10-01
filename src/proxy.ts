@@ -3,7 +3,8 @@ import { updateSession } from "@/supabase/proxy";
 
 // Rutas que requieren sesión. Es una revisión optimista: cada página vuelve a
 // verificar con requireProfile, y RLS protege los datos.
-const PROTECTED = ["/cuenta"];
+const PROTECTED = ["/cuenta", "/mainpage"];
+
 
 export async function proxy(request: NextRequest) {
   const { response, userId } = await updateSession(request);
