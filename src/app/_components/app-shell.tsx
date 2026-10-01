@@ -4,13 +4,14 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, useState } from "react";
 import { signOut } from "@/app/(app)/cuenta/actions";
+import { ACCOUNT_KINDS, type AccountKind } from "@/lib/account/kind";
 import { initials } from "@/lib/marketplace/listings";
 import type { ShellCounts } from "@/supabase/shell";
 import { Brand } from "./brand";
 import { Icon } from "./icon";
 
 type Props = {
-  user: { displayName: string; email: string | null } | null;
+  user: { displayName: string; email: string | null; kind: AccountKind } | null;
   counts: ShellCounts;
   children: ReactNode;
 };
@@ -111,7 +112,11 @@ export function AppShell({ user, counts, children }: Props) {
           {user ? (
             <Link href="/cuenta" className={`user-row ${pathname === "/cuenta" ? "active" : ""}`}>
               <div className="avatar">{userInitials}</div>
-              <div><strong>{user.displayName}</strong>{user.email && <span>{user.email}</span>}</div>
+              <div>
+                <strong>{user.displayName}</strong>
+                <span className="user-kind">{ACCOUNT_KINDS[user.kind].label}</span>
+                {user.email && <span>{user.email}</span>}
+              </div>
               <span className="more">•••</span>
             </Link>
           ) : (

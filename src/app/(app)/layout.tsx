@@ -11,7 +11,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const counts = await getShellCounts(profile?.id ?? null);
 
   return (
-    <AppShell user={profile ? { displayName: profile.displayName, email: profile.email } : null} counts={counts}>
+    <AppShell user={profile ? { displayName: profile.displayName, email: profile.email, kind: profile.kind } : null} counts={counts}>
       {children}
     </AppShell>
   );
