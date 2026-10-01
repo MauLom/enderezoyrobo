@@ -53,29 +53,35 @@ export function OfferForm({ listId, lines }: { listId: string; lines: OfferLine[
         {lines.map((line) => {
           const stock = line.unitPricesMxnCents.length;
           return (
-            <li key={line.wantItemId} className="flex items-center gap-3 border-t border-line-soft px-3 py-2.5 first:border-t-0">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-bold">{line.name}</p>
-                <p className="text-[11px] text-muted">
-                  Pide {line.requested} · {line.detail}
-                  {stock > 0 ? ` · tienes ${stock} desde ${formatMxn(line.unitPricesMxnCents[0])}` : " · no la tienes cargada"}
-                </p>
+            <li key={line.wantItemId} className="flex flex-col gap-2 border-t border-line-soft px-3 py-3 first:border-t-0">
+              <p className="text-[13px]">
+                <span className="font-bold">{line.name}</span>
+                <span className="text-muted"> · pide {line.requested} · {line.detail}</span>
+              </p>
+              <div className="flex flex-wrap items-center gap-2 text-xs">
+                <label htmlFor={`q-${line.wantItemId}`} className={ui.label}>
+                  Copias
+                </label>
+                {/* ui.input trae w-full: el contenedor fija el ancho. */}
+                <div className="w-20">
+                  <input
+                    id={`q-${line.wantItemId}`}
+                    name={`q:${line.wantItemId}`}
+                    type="number"
+                    min={0}
+                    max={line.requested}
+                    value={quantities[line.wantItemId] ?? 0}
+                    onChange={(event) =>
+                      setQuantities((q) => ({ ...q, [line.wantItemId]: Math.max(0, Number(event.target.value) || 0) }))
+                    }
+                    className={`${ui.input} text-center`}
+                  />
+                </div>
+                <span className="text-muted">
+                  de {line.requested}
+                  {stock > 0 ? ` · tienes ${stock} desde ${formatMxn(line.unitPricesMxnCents[0])} c/u` : " · no la tienes cargada"}
+                </span>
               </div>
-              <label className="sr-only" htmlFor={`q-${line.wantItemId}`}>
-                Copias de {line.name}
-              </label>
-              <input
-                id={`q-${line.wantItemId}`}
-                name={`q:${line.wantItemId}`}
-                type="number"
-                min={0}
-                max={line.requested}
-                value={quantities[line.wantItemId] ?? 0}
-                onChange={(event) =>
-                  setQuantities((q) => ({ ...q, [line.wantItemId]: Math.max(0, Number(event.target.value) || 0) }))
-                }
-                className={`${ui.input} w-16 text-center`}
-              />
             </li>
           );
         })}
