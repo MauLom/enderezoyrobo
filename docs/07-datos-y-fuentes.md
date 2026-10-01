@@ -23,7 +23,7 @@ Verificar los términos de uso y los límites de cada fuente antes de implementa
 ## Formatos de importación
 
 - **Texto estilo Moxfield/Arena** (implementado, `src/lib/import/decklist.ts`): `1 Sol Ring (C21) 263`; set y número opcionales. Si faltan, se busca por nombre y se acepta cualquier impresión.
-- **CSV de ManaBox y Moxfield** (pendiente): confirmar las columnas exactas con un export real antes de escribir el parser.
+- **CSV de ManaBox y Moxfield** (`src/lib/import/collection-csv.ts`): las columnas se buscan por nombre. ManaBox: `Name`, `Set code`, `Collector number`, `Foil` (normal/foil/etched), `Quantity` y `Scryfall ID`; si el ID está en el catálogo se pide esa impresión exacta, si no, set y número, y si no, cualquiera. Moxfield: `Count`, `Name`, `Edition`, `Collector Number` y `Foil`. También acepta cualquier CSV con columnas de nombre y cantidad. Condición e idioma no se importan: en una want list son lo mínimo que se pide y se ajustan en cada carta. En "Nueva want list" el archivo se carga en la misma caja y el formato se detecta por el encabezado. Se confirmó a mano con exports reales de ambas aplicaciones el 2026-10-01; los archivos de `src/lib/import/fixtures/` son ejemplos, no esos exports.
 - **CSV de inventario de tienda** (parser implementado en `src/lib/import/store-inventory.ts`, sin pantalla todavía): plantilla propia en `public/plantilla-inventario.csv` con columnas `carta,set,numero,condicion,idioma,foil,cantidad,precio` (precio en MXN). Acepta encabezados con acentos y mayúsculas, condiciones en abreviatura o completas ("Lightly Played") y precios con `$` y comas.
 
 ## Resolución de want lists contra el catálogo

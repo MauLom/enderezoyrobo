@@ -45,6 +45,18 @@ describe("resolveLines", () => {
     expect(warnings).toEqual([]);
   });
 
+  it("con ID de Scryfall pide esa impresión aunque el set no coincida", () => {
+    const line = { ...parseDecklist("1 Sol Ring (c21) 263").lines[0], scryfallId: "sol-cmm" };
+    const { items, warnings } = resolveLines([line], catalog);
+    expect(items[0].printing?.id).toBe("sol-cmm");
+    expect(warnings).toEqual([]);
+  });
+
+  it("si el ID de Scryfall no está en el catálogo usa set y número", () => {
+    const line = { ...parseDecklist("1 Sol Ring (c21) 263").lines[0], scryfallId: "no-existe" };
+    expect(resolveLines([line], catalog).items[0].printing?.id).toBe("sol-c21");
+  });
+
   it("si la impresión no existe acepta cualquiera y avisa", () => {
     const { items, warnings } = resolve("1 Sol Ring (2X2) 190");
     expect(items[0].printing).toBeNull();

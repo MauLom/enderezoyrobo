@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { ui } from "@/app/ui";
 import { type NewListState, newListAction } from "../actions";
 
@@ -12,6 +12,17 @@ const EXAMPLE = `1 Sol Ring (C21) 263
 export function NewListForm() {
   const [state, action, pending] = useActionState<NewListState, FormData>(newListAction, { name: "", text: "" });
   const preview = state.preview;
+  const nameRef = useRef<HTMLInputElement>(null);
+  const textRef = useRef<HTMLTextAreaElement>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
+
+  // El CSV se carga en la misma caja: el servidor detecta el formato por el encabezado.
+  async function loadCsv(file: File | undefined) {
+    if (!file || !textRef.current) return;
+    textRef.current.value = await file.text();
+    if (nameRef.current && !nameRef.current.value.trim()) nameRef.current.value = file.name.replace(/\.csv$/i, "");
+    setFileName(file.name);
+  }
 
   return (
     <form action={action} className="flex max-w-3xl flex-col gap-6">
@@ -20,7 +31,7 @@ export function NewListForm() {
         <label htmlFor="name" className={ui.label}>
           Nombre de la lista
         </label>
-        <input id="name" name="name" defaultValue={state.name} placeholder="Mi deck de Commander" className={ui.input} />
+        <input ref={nameRef} id="name" name="name" defaultValue={state.name} placeholder="Mi deck de Commander" className={ui.input} />
       </div>
 
       <div className="flex flex-col gap-2">
@@ -28,6 +39,7 @@ export function NewListForm() {
           Cartas
         </label>
         <textarea
+          ref={textRef}
           id="text"
           name="text"
           rows={12}
@@ -39,6 +51,21 @@ export function NewListForm() {
           Una carta por línea, como las exporta Moxfield, Arena o ManaBox. Set y número son opcionales: sin ellos
           aceptamos cualquier impresión. <code className="text-accent-text">*F*</code> al final pide foil.
         </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <label className={`${ui.buttonSecondary} cursor-pointer`}>
+            Subir CSV de ManaBox o Moxfield
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              className="sr-only"
+              onChange={(event) => {
+                void loadCsv(event.target.files?.[0]);
+                event.target.value = "";
+              }}
+            />
+          </label>
+          {fileName && <span className={ui.muted}>Cargamos {fileName}. Pulsa &quot;Revisar lista&quot;.</span>}
+        </div>
       </div>
       </div>
 

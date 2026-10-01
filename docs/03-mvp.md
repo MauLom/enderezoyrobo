@@ -17,7 +17,7 @@ El MVP responde una sola pregunta: ¿qué tiendas de Monterrey tienen las cartas
 | # | Punto | Estado | Qué falta |
 | --- | --- | --- | --- |
 | 1 | Registro y verificación de tiendas | Parcial | Login con código, nombre visible y salir listos (`/cuenta`, "Mi perfil" y "Salir" en el menú). Tipo de cuenta listo: jugador o vendedor desde `/cuenta`; `store` solo al registrar una tienda (RLS, prueba en `supabase/tests/`). En "Contacto" se guarda, edita y borra el WhatsApp (privado, tabla `contact`, decisión B en 06) y se elige la zona de entrega (municipio, pública). Falta registrar una tienda y verificarla (hoy solo existen las del seed). Issues #1–#8. |
-| 2 | Importar want list | Parcial | Pegar texto (Moxfield/Arena) funciona con vista previa y avisos. Falta subir CSV de ManaBox/Moxfield (ver 07). Issue #17. |
+| 2 | Importar want list | Listo | Pegar texto (Moxfield/Arena) o subir el CSV de ManaBox/Moxfield, con la misma vista previa y avisos (ver 07). |
 | 3 | Inventario de tienda por CSV | Parcial | Parser y plantilla (`public/plantilla-inventario.csv`) listos y probados. Falta la pantalla para subirlo y guardarlo. Issues #9 y #10. |
 | 4 | Matching | Listo | Cobertura por vendedor y mejor combinación, con pedido armado por WhatsApp. |
 | 5 | Precios de referencia en MXN | Parcial | Se muestra solo TCGplayer (USD, no foil) convertido a MXN. Faltan Cardmarket (ya está en la base, no se muestra) y Card Kingdom (no se sincroniza). Issues #18 y #19. |
