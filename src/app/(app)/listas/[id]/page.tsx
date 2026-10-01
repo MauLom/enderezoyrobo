@@ -105,7 +105,13 @@ export default async function ListaPage({ params }: PageProps<"/listas/[id]">) {
               <p className="text-sm">
                 Enviaste una oferta de <strong className="text-accent-soft">{formatMxn(pendingOffer.totalMxnCents)}</strong>{" "}
                 <span className={ui.badgeWarn}>{STATUS_LABEL.pending}</span>
-                <span className={`${ui.muted} mt-1 block`}>{list.ownerName} puede aceptarla o rechazarla.</span>
+                <span className={`${ui.muted} mt-1 block`}>
+                  {list.ownerName} puede aceptarla o rechazarla; puedes retirarla en{" "}
+                  <Link href="/ofertas" className={ui.link}>
+                    Ofertas
+                  </Link>
+                  .
+                </span>
               </p>
             ) : (
               <>
