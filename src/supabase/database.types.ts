@@ -36,6 +36,25 @@ export type Database = {
                   Relationships: [
                     
                   ]
+                },"contact": {
+                  Row: {
+                    "profile_id": string,"updated_at": string,"whatsapp": string
+                  }
+                  Insert: {
+                    "profile_id": string,"updated_at"?: string,"whatsapp": string
+                  }
+                  Update: {
+                    "profile_id"?: string,"updated_at"?: string,"whatsapp"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "contact_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: true
+      referencedRelation: "profile"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"exchange_rate": {
                   Row: {
                     "as_of": string,"currency": string,"mxn_per_unit": number
@@ -145,13 +164,13 @@ isOneToOne: false
                   ]
                 },"profile": {
                   Row: {
-                    "created_at": string,"display_name": string,"id": string,"kind": Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at": string | null,"plan": string,"verified": boolean,"whatsapp": string | null
+                    "created_at": string,"display_name": string,"id": string,"kind": Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at": string | null,"plan": string,"verified": boolean
                   }
                   Insert: {
-                    "created_at"?: string,"display_name": string,"id": string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean,"whatsapp"?: string | null
+                    "created_at"?: string,"display_name": string,"id": string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean
                   }
                   Update: {
-                    "created_at"?: string,"display_name"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean,"whatsapp"?: string | null
+                    "created_at"?: string,"display_name"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["profile_kind"],"oportunidades_vistas_at"?: string | null,"plan"?: string,"verified"?: boolean
                   }
                   Relationships: [
                     
@@ -297,6 +316,9 @@ isOneToOne: false
                            },
 "show_trgm":
 { Args: { "": string }; Returns: (string)[]
+                           },
+"whatsapp_de_oferta":
+{ Args: { "p_offer_id": string }; Returns: string
                            }
           }
           Enums: {

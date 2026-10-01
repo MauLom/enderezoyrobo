@@ -31,7 +31,7 @@ El 2026-09-30 llegó `src/app/dashboard/` (hoy `src/app/(app)/dashboard/`): un p
 | Sección del prototipo | Estado |
 | --- | --- |
 | Marketplace | Real. Inventario de tiendas y vendedores agrupado por carta, con el precio más bajo, imagen del catálogo y vendedor. Primero las cartas que el usuario busca; luego las ofertas más recientes (hasta 200 renglones, más todas las de sus listas). Lógica en `src/lib/marketplace/`, consulta en `src/supabase/marketplace.ts` |
-| Modal "Ofertas disponibles" | Real. Cada oferta con condición, set, foil, idioma y existencias; el botón abre WhatsApp con el mensaje armado. Solo las tiendas tienen WhatsApp público (ver 06, privacidad del WhatsApp) |
+| Modal "Ofertas disponibles" | Real. Cada oferta con condición, set, foil, idioma y existencias; el botón abre WhatsApp con el mensaje armado. Solo las tiendas tienen WhatsApp público; el de particulares se revela con una oferta aceptada (ver 06, privacidad del WhatsApp) |
 | Búsqueda | En la barra superior de todas las páginas. Filtra el marketplace (`/dashboard?q=…`) sin acentos ni mayúsculas. No consulta a Scryfall |
 | Filtro "Mi wishlist" y panel "Tu wishlist" | Real. Cartas de todas las want lists del usuario con cuántas ofertas hay y el mejor precio; "Administrar" lleva a `/listas` |
 | Usuario (nombre, iniciales, correo) | Real, del perfil con sesión |

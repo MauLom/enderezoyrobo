@@ -53,16 +53,15 @@ El diseño de Figma del marketplace (tema oscuro, acento violeta, barra superior
 
 ## Privacidad del WhatsApp (decidido el 2026-10-01)
 
-`profile.whatsapp` y `store.whatsapp` son públicos, porque la política de lectura de ambas tablas es `using (true)`. Para una tienda está bien. Para un jugador, su número no debería verse hasta que haya una oferta de por medio. Hay que decidirlo antes de pedir el número en la UI. Por eso `/cuenta` todavía no lo pide.
+Opción **B, solo con oferta aceptada** ([#1](https://github.com/MauLom/enderezoyrobo/issues/1)). El WhatsApp de jugadores y vendedores no se muestra públicamente en listas ni en el marketplace. El contacto entre particulares llega con las ofertas y tratos (fase 3); mientras, con las tiendas se habla por su WhatsApp público, con el pedido armado desde la plataforma.
 
-Consecuencia actual: los botones de WhatsApp (matching y marketplace) solo usan `store.whatsapp`, así que un vendedor sin tienda aparece con "Sin WhatsApp" y no hay forma de contactarlo. Tampoco hay dónde capturar el número: `/cuenta` solo tiene el nombre visible. Es el issue [#1](https://github.com/MauLom/enderezoyrobo/issues/1), primero del [plan](04-plan-y-criterios.md#plan-de-trabajo), porque la cuenta completa depende de esto.
+Se descartaron la A (público por elección: quien lo active queda expuesto a cualquiera) y la C (solo tiendas: el plan Vendedor básico no tendría sentido). B da más privacidad, evita spam y deja el piloto centrado en el inventario de las tiendas.
 
-Opciones:
+Implementación ([#2](https://github.com/MauLom/enderezoyrobo/issues/2)):
 
-| Opción | Cómo funciona | A favor | En contra |
-| --- | --- | --- | --- |
-| A. Público por elección | El número se mueve a una tabla aparte (`contact`) con RLS: lo ve su dueño y, si marcó "Mostrar mi WhatsApp a compradores", cualquiera. Apagado por defecto | Simple; el vendedor particular decide; funciona ya en marketplace y matching | Quien lo active queda expuesto a cualquiera que entre |
-| B. Solo con oferta | El número solo se revela entre dos personas con una oferta aceptada (función *security definer*) | Más privado | El vendedor particular no se puede contactar hasta que existan las ofertas (fase 3) |
-| C. Solo tiendas | Los jugadores no guardan número; solo las tiendas tienen contacto | Nada que proteger | El plan Vendedor básico no sirve: nadie puede contactar a un particular |
+- El número vive en la tabla `contact` (`profile_id`, `whatsapp`), sin lectura pública: RLS solo deja leerlo y editarlo a su dueño. Se quitó `profile.whatsapp`.
+- `whatsapp_de_oferta(offer_id)` (*security definer*, solo con sesión) devuelve el número de la otra parte si la oferta está aceptada y el usuario es el vendedor o el dueño de la lista; si no, null.
+- `store.whatsapp` sigue público: es el canal de la tienda.
+- Pruebas contra la base en `supabase/tests/contacto_privado.test.sql` (`npm run db:test`).
 
-Recomendación: **A**, con un aviso claro al activarlo, y después agregar B para el contacto que nace de una oferta. En cualquier caso hay que quitar la lectura pública de `profile.whatsapp`.
+Consecuencia: en matching y marketplace un vendedor particular sigue saliendo con "Sin WhatsApp"; es lo esperado hasta la fase 3.
