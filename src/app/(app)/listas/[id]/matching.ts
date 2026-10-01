@@ -14,9 +14,8 @@ export type ListMatching = {
   sellersPerItem: Map<string, number>;
 };
 
-/** `dealContacts`: WhatsApp de quienes tienen una oferta aceptada con quien mira (ver getDealContacts). */
-export function computeMatching(list: WantListDetail, dealContacts: ReadonlyMap<string, string>): ListMatching {
-  const want: WantItem[] = list.items.map((i) => ({
+export function toWantItems(list: WantListDetail): WantItem[] {
+  return list.items.map((i) => ({
     id: i.id,
     oracleId: i.oracleId,
     printingId: i.printingId,
@@ -25,7 +24,10 @@ export function computeMatching(list: WantListDetail, dealContacts: ReadonlyMap<
     foil: i.foil,
     language: i.language,
   }));
-  const inventory: InventoryItem[] = list.inventory.map((r) => ({
+}
+
+export function toInventoryItems(rows: InventoryRow[]): InventoryItem[] {
+  return rows.map((r) => ({
     id: r.id,
     storeId: r.sellerId,
     oracleId: r.oracleId,
@@ -36,6 +38,12 @@ export function computeMatching(list: WantListDetail, dealContacts: ReadonlyMap<
     quantity: r.quantity,
     priceMxnCents: r.priceMxnCents,
   }));
+}
+
+/** `dealContacts`: WhatsApp de quienes tienen una oferta aceptada con quien mira (ver getDealContacts). */
+export function computeMatching(list: WantListDetail, dealContacts: ReadonlyMap<string, string>): ListMatching {
+  const want = toWantItems(list);
+  const inventory = toInventoryItems(list.inventory);
 
   const sellers = new Map<string, SellerInfo>();
   for (const r of list.inventory) {

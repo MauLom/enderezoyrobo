@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { parseCondition } from "@/lib/cards/condition";
+import { parseOfferForm } from "@/lib/offers/offers";
 import { createClient } from "@/supabase/server";
 import { requireProfile } from "@/supabase/session";
 import { createWantList, resolveDecklist } from "@/supabase/want-lists";
@@ -131,4 +132,48 @@ export async function deleteItem(listId: string, itemId: string) {
   const { error } = await supabase.from("want_list_item").delete().eq("id", itemId).eq("want_list_id", listId);
   if (error) throw error;
   await touchList(listId);
+}
+
+export type OfferState = { error?: string };
+
+/**
+ * Oferta por el lote de una lista pública ajena. Las cantidades llegan como
+ * `q:<id del item>`. RLS y crear_oferta impiden ofertar sobre una lista propia
+ * o privada; aquí solo se traducen los errores.
+ */
+export async function makeOffer(listId: string, _prev: OfferState, formData: FormData): Promise<OfferState> {
+  const profile = await requireProfile();
+  if (profile.kind === "player") return { error: "Cambia tu cuenta a vendedor para hacer ofertas." };
+
+  const supabase = await createClient();
+  const { data: wantItems, error: itemsError } = await supabase
+    .from("want_list_item")
+    .select("id, quantity")
+    .eq("want_list_id", listId);
+  if (itemsError) return { error: "No pudimos cargar la lista. Intenta de nuevo." };
+
+  const quantities: Record<string, string> = {};
+  for (const [key, value] of formData) {
+    if (key.startsWith("q:")) quantities[key.slice(2)] = String(value);
+  }
+  const offer = parseOfferForm(
+    { total: String(formData.get("total") ?? ""), message: String(formData.get("message") ?? ""), quantities },
+    wantItems,
+  );
+  if (!offer.ok) return { error: offer.error };
+
+  const { error } = await supabase.rpc("crear_oferta", {
+    lista: listId,
+    total: offer.value.totalMxnCents,
+    mensaje: offer.value.message ?? "",
+    items: offer.value.items.map((i) => ({ want_list_item_id: i.wantListItemId, quantity: i.quantity })),
+  });
+  if (error) {
+    if (error.code === "23505") return { error: "Ya tienes una oferta pendiente en esta lista." };
+    if (error.code === "42501") return { error: "No puedes ofertar sobre esta lista." };
+    return { error: "No pudimos enviar la oferta. Intenta de nuevo." };
+  }
+
+  revalidatePath(`/listas/${listId}`);
+  return {};
 }

@@ -21,7 +21,7 @@ El MVP responde una sola pregunta: ¿qué tiendas de Monterrey tienen las cartas
 | 3 | Inventario de tienda por CSV | Parcial | Parser y plantilla (`public/plantilla-inventario.csv`) listos y probados. Falta la pantalla para subirlo y guardarlo. Issues #9 y #10. |
 | 4 | Matching | Listo | Cobertura por vendedor y mejor combinación, con pedido armado por WhatsApp. |
 | 5 | Precios de referencia en MXN | Parcial | Se muestra solo TCGplayer (USD, no foil) convertido a MXN. Faltan Cardmarket (ya está en la base, no se muestra) y Card Kingdom (no se sincroniza). Issues #18 y #19. |
-| 6 | Listas públicas y ofertas | Parcial | Hacer pública una lista y copiar su enlace funciona. Reglas de la oferta en `src/lib/offers/` (armar, validar, cambios de estado) y tabla `offer` con su trigger listos; el seed trae ofertas. Falta la pantalla: botón "hacer oferta" y bandeja para aceptar, rechazar o retirar. Issues #23 y #24 (diciembre). |
+| 6 | Listas públicas y ofertas | Parcial | Hacer pública una lista y copiar su enlace funciona. Reglas de la oferta en `src/lib/offers/` (armar, validar, cambios de estado) y tabla `offer` con su trigger listos; el seed trae ofertas. En `/listas/<id>` de una lista pública ajena, un vendedor o tienda hace una oferta por el lote: propuesta armada desde su inventario, cantidades y total ajustables y mensaje (#23); un jugador ve la invitación a cambiar a vendedor. Falta la bandeja para aceptar, rechazar o retirar (#24). |
 | 7 | "Inventario actualizado hace X días" | Listo | Se marca en ámbar después de 30 días. |
 
 ## Marketplace (`/dashboard`)
