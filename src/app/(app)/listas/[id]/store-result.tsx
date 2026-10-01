@@ -80,7 +80,11 @@ export function StoreResult({ result, seller, inventoryById }: Props) {
           Pedir por WhatsApp
         </a>
       ) : (
-        <p className={ui.muted}>Este vendedor no tiene WhatsApp registrado.</p>
+        <p className={ui.muted}>
+          {seller.isStore
+            ? "Esta tienda no tiene WhatsApp registrado."
+            : "El WhatsApp de un vendedor particular se comparte cuando acepta una oferta contigo."}
+        </p>
       )}
     </article>
   );
