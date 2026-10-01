@@ -16,7 +16,7 @@ El MVP responde una sola pregunta: ¿qué tiendas de Monterrey tienen las cartas
 
 | # | Punto | Estado | Qué falta |
 | --- | --- | --- | --- |
-| 1 | Registro y verificación de tiendas | Parcial | Login con código, nombre visible y salir listos (`/cuenta`, "Mi perfil" y "Salir" en el menú). Faltan datos de contacto (WhatsApp, pendiente de la decisión de privacidad en 06), zona y tipo de cuenta; registrar una tienda y verificarla (hoy solo existen las del seed). Issues #1–#8. |
+| 1 | Registro y verificación de tiendas | Parcial | Login con código, nombre visible y salir listos (`/cuenta`, "Mi perfil" y "Salir" en el menú). El WhatsApp de particulares es privado (tabla `contact`, decisión B en 06); falta capturarlo en `/cuenta` (#3), la zona y el tipo de cuenta; registrar una tienda y verificarla (hoy solo existen las del seed). Issues #1–#8. |
 | 2 | Importar want list | Parcial | Pegar texto (Moxfield/Arena) funciona con vista previa y avisos. Falta subir CSV de ManaBox/Moxfield (ver 07). Issue #17. |
 | 3 | Inventario de tienda por CSV | Parcial | Parser y plantilla (`public/plantilla-inventario.csv`) listos y probados. Falta la pantalla para subirlo y guardarlo. Issues #9 y #10. |
 | 4 | Matching | Listo | Cobertura por vendedor y mejor combinación, con pedido armado por WhatsApp. |
@@ -31,7 +31,7 @@ El 2026-09-30 llegó `src/app/dashboard/` (hoy `src/app/(app)/dashboard/`): un p
 | Sección del prototipo | Estado |
 | --- | --- |
 | Marketplace | Real. Inventario de tiendas y vendedores agrupado por carta, con el precio más bajo, imagen del catálogo y vendedor. Primero las cartas que el usuario busca; luego las ofertas más recientes (hasta 200 renglones, más todas las de sus listas). Lógica en `src/lib/marketplace/`, consulta en `src/supabase/marketplace.ts` |
-| Modal "Ofertas disponibles" | Real. Cada oferta con condición, set, foil, idioma y existencias; el botón abre WhatsApp con el mensaje armado. Solo las tiendas tienen WhatsApp público (ver 06, privacidad del WhatsApp) |
+| Modal "Ofertas disponibles" | Real. Cada oferta con condición, set, foil, idioma y existencias; el botón abre WhatsApp con el mensaje armado. Solo las tiendas tienen WhatsApp público; el de particulares se revela con una oferta aceptada (ver 06, privacidad del WhatsApp) |
 | Búsqueda | En la barra superior de todas las páginas. Filtra el marketplace (`/dashboard?q=…`) sin acentos ni mayúsculas. No consulta a Scryfall |
 | Filtro "Mi wishlist" y panel "Tu wishlist" | Real. Cartas de todas las want lists del usuario con cuántas ofertas hay y el mejor precio; "Administrar" lleva a `/listas` |
 | Usuario (nombre, iniciales, correo) | Real, del perfil con sesión |

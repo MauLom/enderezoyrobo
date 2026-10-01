@@ -1,6 +1,6 @@
 /**
  * Datos de prueba para validar flujos: tiendas, un vendedor, jugadores con want
- * lists, ofertas y una calificación. Requiere el catálogo cargado (sync:catalogo).
+ * lists, ofertas, contactos privados y una calificación. Requiere el catálogo cargado (sync:catalogo).
  *
  *   npm run seed                    # borra y vuelve a crear los datos de prueba
  *   npm run seed -- --limpiar       # solo borra los datos de prueba
@@ -36,6 +36,8 @@ type Person = {
   displayName: string;
   kind: "player" | "seller" | "store";
   verified?: boolean;
+  /** WhatsApp privado (tabla contact): solo lo ve la otra parte de una oferta aceptada. */
+  whatsapp?: string;
   store?: { name: string; address: string; whatsapp: string; priceNote: string; verified: boolean; updatedDaysAgo: number };
 };
 
@@ -85,8 +87,8 @@ const PEOPLE: Person[] = [
       updatedDaysAgo: 45,
     },
   },
-  { key: "ana", email: `vendedora.ana${SEED_DOMAIN}`, displayName: "Ana (prueba)", kind: "seller" },
-  { key: "beto", email: `jugador.beto${SEED_DOMAIN}`, displayName: "Beto (prueba)", kind: "player" },
+  { key: "ana", email: `vendedora.ana${SEED_DOMAIN}`, displayName: "Ana (prueba)", kind: "seller", whatsapp: "+528100000010" },
+  { key: "beto", email: `jugador.beto${SEED_DOMAIN}`, displayName: "Beto (prueba)", kind: "player", whatsapp: "+528100000011" },
   { key: "carla", email: `jugadora.carla${SEED_DOMAIN}`, displayName: "Carla (prueba)", kind: "player" },
 ];
 
@@ -248,6 +250,9 @@ async function seed(tx: Tx) {
   const ids: Record<string, string> = {};
   for (const person of PEOPLE) {
     ids[person.key] = await createUser(tx, person);
+    if (person.whatsapp) {
+      await tx`insert into contact (profile_id, whatsapp) values (${ids[person.key]}, ${person.whatsapp})`;
+    }
     const store = person.store;
     if (store) {
       await tx`
@@ -307,6 +312,15 @@ async function seed(tx: Tx) {
     insert into offer_item (offer_id, want_list_item_id, quantity)
     values (${pending.id}, ${betoItems[0]}, 1), (${pending.id}, ${betoItems[1]}, 1)`;
 
+  // Oferta aceptada de Ana (particular) por el Cyclonic Rift foil de Beto: cada uno ve el WhatsApp del otro.
+  const [anaOffer] = await tx<{ id: string }[]>`
+    insert into offer (want_list_id, seller_id, total_mxn_cents, message, status)
+    values (${wantListIds["Commander de Atraxa"]}, ${ids.ana}, ${560 * 100}, 'Mi Cyclonic Rift foil NM, nos vemos en la Macroplaza.', 'accepted')
+    returning id`;
+  await tx`
+    insert into offer_item (offer_id, want_list_item_id, quantity)
+    values (${anaOffer.id}, ${betoItems[4]}, 1)`;
+
   // Oferta aceptada de La Guarida a Carla, con calificación de Carla.
   const [accepted] = await tx<{ id: string }[]>`
     insert into offer (want_list_id, seller_id, total_mxn_cents, message, status)
@@ -321,7 +335,7 @@ async function seed(tx: Tx) {
     values (${ids.carla}, ${ids.guarida}, ${accepted.id}, 5, 'Todo como lo describieron, entrega en tienda sin problema.')`;
 
   console.log(
-    `Seed: ${PEOPLE.length} usuarios, ${inventoryCount} renglones de inventario, ${WANT_LISTS.length} want lists, 2 ofertas, 1 calificación`,
+    `Seed: ${PEOPLE.length} usuarios, ${inventoryCount} renglones de inventario, ${WANT_LISTS.length} want lists, 3 ofertas, 1 calificación`,
   );
   for (const person of PEOPLE) console.log(`  ${person.email.padEnd(28)} ${person.displayName}`);
 }

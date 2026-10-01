@@ -13,16 +13,16 @@ En Supabase local puedes entrar como cualquiera de ellos desde `/entrar`: el có
 | `tienda.dragon@mazo.test` | Tienda verificada, inventario de hace 2 días | La que más cubre; hizo una oferta pendiente a Beto |
 | `tienda.guarida@mazo.test` | Tienda verificada, inventario de hace 10 días | Foil, cartas en español, precios más bajos en MP; oferta aceptada con Carla y calificación de 5 |
 | `tienda.barrio@mazo.test` | Tienda **sin verificar**, inventario de hace 45 días | Insignia de verificación y aviso de inventario viejo; sus cartas HP y DMG no cumplen la condición mínima |
-| `vendedora.ana@mazo.test` | Vendedor sin tienda | Inventario de un particular |
-| `jugador.beto@mazo.test` | Jugador | Lista pública "Commander de Atraxa" y lista privada "Modern (privada)" |
-| `jugadora.carla@mazo.test` | Jugadora | Lista pública "Pauper Izzet" |
+| `vendedora.ana@mazo.test` | Vendedor sin tienda, con WhatsApp privado | Inventario de un particular; oferta aceptada con Beto por su Cyclonic Rift |
+| `jugador.beto@mazo.test` | Jugador con WhatsApp privado | Lista pública "Commander de Atraxa" y lista privada "Modern (privada)" |
+| `jugadora.carla@mazo.test` | Jugadora sin WhatsApp | Lista pública "Pauper Izzet" |
 
 Casos que cubre el matching con estos datos (comprobados con `src/lib/matching`):
 
 - **Commander de Atraxa (Beto):** ninguna tienda sola la completa (El Dragón 75 %, La Guarida 13 %); juntas llegan al 88 %. Falta Demonic Tutor: solo hay una copia DMG y la lista pide LP o mejor. Pide una Atraxa de impresión exacta (2XM 190), Rhystic Study en NM y Smothering Tithe en foil.
 - **Pauper Izzet (Carla):** pide 4 copias de cada carta; ninguna tienda tiene todo (La Guarida 75 %, El Dragón 50 %) y entre las dos la cubren al 100 %. El Counterspell HP de Cartas del Barrio no cuenta porque la lista pide MP o mejor.
 - **Modern (Beto, privada):** Thoughtseize en español (solo La Guarida lo tiene en español). Un visitante sin sesión no debe ver esta lista.
-- **Permisos:** sin sesión se ven las dos listas públicas y ninguna oferta; Beto ve sus tres listas y la oferta que recibió.
+- **Permisos:** sin sesión se ven las dos listas públicas y ninguna oferta; Beto ve sus tres listas y las dos ofertas que recibió. Nadie sin sesión lee la tabla `contact`; Ana y Beto obtienen el WhatsApp del otro con `whatsapp_de_oferta` (oferta aceptada) y Carla no obtiene el de Ana. Lo comprueba `npm run db:test`.
 
 ## Qué validar en la app
 
