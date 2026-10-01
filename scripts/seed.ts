@@ -38,6 +38,8 @@ type Person = {
   verified?: boolean;
   /** WhatsApp privado (tabla contact): solo lo ve la otra parte de una oferta aceptada. */
   whatsapp?: string;
+  /** Municipio de DELIVERY_ZONES (src/lib/account/validation.ts). */
+  deliveryZone?: string;
   store?: { name: string; address: string; whatsapp: string; priceNote: string; verified: boolean; updatedDaysAgo: number };
 };
 
@@ -87,8 +89,8 @@ const PEOPLE: Person[] = [
       updatedDaysAgo: 45,
     },
   },
-  { key: "ana", email: `vendedora.ana${SEED_DOMAIN}`, displayName: "Ana (prueba)", kind: "seller", whatsapp: "+528100000010" },
-  { key: "beto", email: `jugador.beto${SEED_DOMAIN}`, displayName: "Beto (prueba)", kind: "player", whatsapp: "+528100000011" },
+  { key: "ana", email: `vendedora.ana${SEED_DOMAIN}`, displayName: "Ana (prueba)", kind: "seller", whatsapp: "+528100000010", deliveryZone: "San Nicolás de los Garza" },
+  { key: "beto", email: `jugador.beto${SEED_DOMAIN}`, displayName: "Beto (prueba)", kind: "player", whatsapp: "+528100000011", deliveryZone: "Monterrey" },
   { key: "carla", email: `jugadora.carla${SEED_DOMAIN}`, displayName: "Carla (prueba)", kind: "player" },
 ];
 
@@ -239,7 +241,9 @@ async function createUser(tx: Tx, person: Person): Promise<string> {
     insert into auth.identities (provider_id, user_id, identity_data, provider, created_at, updated_at)
     values (${id}, ${id}, ${tx.json({ sub: id, email: person.email, email_verified: true })}, 'email', now(), now())`;
   // El trigger handle_new_user ya creó el profile; aquí se completa.
-  await tx`update profile set kind = ${person.kind}, verified = ${person.verified ?? false} where id = ${id}`;
+  await tx`
+    update profile set kind = ${person.kind}, verified = ${person.verified ?? false}, delivery_zone = ${person.deliveryZone ?? null}
+    where id = ${id}`;
   return id;
 }
 

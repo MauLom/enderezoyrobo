@@ -45,7 +45,7 @@ El esquema implementado está en `supabase/migrations/` y manda sobre este resum
 
 - `card_printing`: id de Scryfall, oracle id, nombre, set, número, imagen, rareza.
 - `price_reference`: printing, fuente (ck, tcgplayer, cardmarket), moneda, valor, acabado (nonfoil, foil, etched), fecha. Solo el último valor, sin historial.
-- `profile`: usuario, nombre visible, tipo (jugador, vendedor, tienda), plan, verificado. El tipo no se puede cambiar desde la UI. Las calificaciones van en la tabla `rating`.
+- `profile`: usuario, nombre visible, tipo (jugador, vendedor, tienda), plan, verificado, zona de entrega (`delivery_zone`, municipio del área metropolitana, pública). El usuario cambia entre jugador y vendedor desde `/cuenta`; `store` solo al registrar una tienda (RLS). Las calificaciones van en la tabla `rating`.
 - `contact`: WhatsApp privado de jugadores y vendedores; solo lo lee su dueño, y la otra parte de una oferta aceptada con `whatsapp_de_oferta` (ver 06).
 - `store`: perfil, dirección, WhatsApp (público), referencia de precio declarada, `inventory_updated_at`.
 - `inventory_item`: vendedor, printing, condición, idioma, foil, cantidad, precio MXN.

@@ -1,5 +1,7 @@
 /** Validación de los datos de cuenta que escribe el usuario. Devuelven el valor limpio o un mensaje de error. */
 
+import { whatsappNumber } from "@/lib/contact/whatsapp";
+
 export type Validated<T> = { ok: true; value: T } | { ok: false; error: string };
 
 export function validateEmail(raw: string): Validated<string> {
@@ -28,6 +30,39 @@ export function validateDisplayName(raw: string): Validated<string> {
     return { ok: false, error: `El nombre puede tener hasta ${DISPLAY_NAME_MAX} caracteres.` };
   }
   return { ok: true, value: name };
+}
+
+/** WhatsApp en formato internacional ("+5281…"). Vacío es válido y significa borrar el número. */
+export function validateWhatsapp(raw: string): Validated<string | null> {
+  if (raw.trim() === "") return { ok: true, value: null };
+  const number = whatsappNumber(raw);
+  if (!number) return { ok: false, error: "Escribe un número de 10 dígitos, p. ej. 81 1234 5678." };
+  return { ok: true, value: `+${number}` };
+}
+
+/** Municipios del área metropolitana de Monterrey para la zona de entrega. */
+export const DELIVERY_ZONES = [
+  "Monterrey",
+  "San Pedro Garza García",
+  "San Nicolás de los Garza",
+  "Guadalupe",
+  "Apodaca",
+  "General Escobedo",
+  "Santa Catarina",
+  "García",
+  "Juárez",
+  "Santiago",
+  "Cadereyta Jiménez",
+  "Salinas Victoria",
+  "Pesquería",
+] as const;
+
+/** Zona de entrega: uno de DELIVERY_ZONES, o vacío para no indicar ninguna. */
+export function validateDeliveryZone(raw: string): Validated<string | null> {
+  const zone = raw.trim();
+  if (zone === "") return { ok: true, value: null };
+  if (!(DELIVERY_ZONES as readonly string[]).includes(zone)) return { ok: false, error: "Elige un municipio de la lista." };
+  return { ok: true, value: zone };
 }
 
 /** Página de inicio con sesión: a donde se llega al entrar si no se pedía otra. */

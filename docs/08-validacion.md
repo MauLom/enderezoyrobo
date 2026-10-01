@@ -13,8 +13,8 @@ En Supabase local puedes entrar como cualquiera de ellos desde `/entrar`: el có
 | `tienda.dragon@mazo.test` | Tienda verificada, inventario de hace 2 días | La que más cubre; hizo una oferta pendiente a Beto |
 | `tienda.guarida@mazo.test` | Tienda verificada, inventario de hace 10 días | Foil, cartas en español, precios más bajos en MP; oferta aceptada con Carla y calificación de 5 |
 | `tienda.barrio@mazo.test` | Tienda **sin verificar**, inventario de hace 45 días | Insignia de verificación y aviso de inventario viejo; sus cartas HP y DMG no cumplen la condición mínima |
-| `vendedora.ana@mazo.test` | Vendedor sin tienda, con WhatsApp privado | Inventario de un particular; oferta aceptada con Beto por su Cyclonic Rift |
-| `jugador.beto@mazo.test` | Jugador con WhatsApp privado | Lista pública "Commander de Atraxa" y lista privada "Modern (privada)" |
+| `vendedora.ana@mazo.test` | Vendedor sin tienda, con WhatsApp privado y zona San Nicolás | Inventario de un particular; oferta aceptada con Beto por su Cyclonic Rift |
+| `jugador.beto@mazo.test` | Jugador con WhatsApp privado y zona Monterrey | Lista pública "Commander de Atraxa" y lista privada "Modern (privada)" |
 | `jugadora.carla@mazo.test` | Jugadora sin WhatsApp | Lista pública "Pauper Izzet" |
 
 Casos que cubre el matching con estos datos (comprobados con `src/lib/matching`):

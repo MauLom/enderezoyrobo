@@ -4,6 +4,7 @@ import { PageHeader } from "@/app/_components/page-header";
 import { ui } from "@/app/ui";
 import { ACCOUNT_KINDS } from "@/lib/account/kind";
 import { initials } from "@/lib/marketplace/listings";
+import { getMyWhatsapp } from "@/supabase/contacts";
 import { requireProfile } from "@/supabase/session";
 import { signOut } from "./actions";
 import { KindForm } from "./kind-form";
@@ -13,6 +14,7 @@ export const metadata: Metadata = { title: "Mi cuenta · Mazo" };
 
 export default async function CuentaPage() {
   const profile = await requireProfile();
+  const whatsapp = await getMyWhatsapp(profile.id);
 
   return (
     <>
