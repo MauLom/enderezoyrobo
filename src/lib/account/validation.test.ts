@@ -42,10 +42,10 @@ describe("safeNextPath", () => {
   });
 
   it("rechaza rutas externas o vacías", () => {
-    expect(safeNextPath("//evil.com")).toBe("/cuenta");
-    expect(safeNextPath("https://evil.com")).toBe("/cuenta");
-    expect(safeNextPath("/\\evil.com")).toBe("/cuenta");
-    expect(safeNextPath(null)).toBe("/cuenta");
+    expect(safeNextPath("//evil.com")).toBe("/dashboard");
+    expect(safeNextPath("https://evil.com")).toBe("/dashboard");
+    expect(safeNextPath("/\\evil.com")).toBe("/dashboard");
+    expect(safeNextPath(null)).toBe("/dashboard");
     expect(safeNextPath("", "/listas")).toBe("/listas");
   });
 });

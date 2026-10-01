@@ -1,5 +1,6 @@
 import { bestCombinations, type InventoryItem, matchByStore, matchesWant, type MatchResult, type WantItem } from "@/lib/matching/match";
-import type { InventoryRow, WantListDetail } from "@/supabase/want-lists";
+import type { InventoryRow } from "@/supabase/inventory";
+import type { WantListDetail } from "@/supabase/want-lists";
 
 export type SellerInfo = Pick<InventoryRow, "sellerId" | "sellerName" | "isStore" | "verified" | "whatsapp" | "inventoryUpdatedAt">;
 

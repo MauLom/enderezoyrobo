@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@/app/_components/icon";
+import { ui } from "@/app/ui";
 
 /** Copia la URL de la página actual para pegarla en grupos de WhatsApp o Facebook. */
 export function CopyLink() {
@@ -9,14 +11,14 @@ export function CopyLink() {
   return (
     <button
       type="button"
-      className="text-sm underline underline-offset-2"
+      className={ui.buttonSecondary}
       onClick={async () => {
         await navigator.clipboard.writeText(window.location.href);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }}
     >
-      {copied ? "¡Enlace copiado!" : "Copiar enlace para compartir"}
+      <Icon name="copy" size={14} /> {copied ? "¡Enlace copiado!" : "Copiar enlace"}
     </button>
   );
 }

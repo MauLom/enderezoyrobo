@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { ui } from "@/app/ui";
 import { type DevLoginState, devLogin } from "./actions";
 
 // Usuarios de scripts/seed.ts.
@@ -18,10 +19,10 @@ export function DevLogin({ next }: { next?: string }) {
   const [state, action, pending] = useActionState<DevLoginState, FormData>(devLogin, {});
 
   return (
-    <section className="flex flex-col gap-3 rounded-md border border-dashed border-amber-500/60 p-4">
+    <section className="flex flex-col gap-3 rounded-xl border border-dashed border-warn/50 bg-warn/5 p-4">
       <div>
-        <h2 className="text-sm font-semibold">Entrar sin correo (solo desarrollo)</h2>
-        <p className="text-xs opacity-70">No manda correo. No existe en producción.</p>
+        <h2 className="text-xs font-bold text-warn">Entrar sin correo (solo desarrollo)</h2>
+        <p className={ui.muted}>No manda correo. No existe en producción.</p>
       </div>
       <form action={action} className="flex gap-2">
         {next && <input type="hidden" name="next" value={next} />}
@@ -30,9 +31,9 @@ export function DevLogin({ next }: { next?: string }) {
           type="email"
           placeholder="cualquier correo"
           required
-          className="min-w-0 flex-1 rounded-md border border-foreground/20 bg-transparent px-2 py-1 text-sm"
+          className={`${ui.input} min-w-0 flex-1 py-2`}
         />
-        <button type="submit" disabled={pending} className="rounded-md border border-foreground/30 px-3 py-1 text-sm">
+        <button type="submit" disabled={pending} className={ui.buttonSecondary}>
           Entrar
         </button>
       </form>
@@ -45,14 +46,14 @@ export function DevLogin({ next }: { next?: string }) {
             name="email"
             value={email}
             disabled={pending}
-            className="rounded-full border border-foreground/20 px-2 py-0.5 text-xs"
+            className="rounded-full border border-line bg-cream px-2.5 py-1 text-[11px] font-semibold text-muted transition hover:border-accent hover:text-ink"
           >
             {label}
           </button>
         ))}
       </form>
       {state.error && (
-        <p className="text-sm text-red-600" role="alert">
+        <p className={ui.error} role="alert">
           {state.error}
         </p>
       )}

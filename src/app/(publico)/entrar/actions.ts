@@ -10,7 +10,6 @@ export type LoginState =
   | { step: "email"; email?: string; error?: string }
   | { step: "code"; email: string; error?: string };
 
-
 /**
  * Entrar con código de un solo uso por correo, en dos pasos: `intent=send`
  * manda el código (y crea la cuenta si no existe); `intent=verify` lo verifica
@@ -31,11 +30,7 @@ export async function login(_prev: LoginState, formData: FormData): Promise<Logi
 
     const { error } = await supabase.auth.verifyOtp({ email: email.value, token: code.value, type: "email" });
     if (error) return { step: "code", email: email.value, error: "El código no es válido o ya venció." };
-<<<<<<< HEAD
-    redirect("/dashboard");
-=======
     redirect(safeNextPath(formData.get("next")));
->>>>>>> daeac65 (quack)
   }
 
   const { error } = await supabase.auth.signInWithOtp({ email: email.value, options: { shouldCreateUser: true } });

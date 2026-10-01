@@ -1,11 +1,12 @@
 "use client";
 
 import { useActionState } from "react";
+import { ui } from "@/app/ui";
 import { type LoginState, login } from "./actions";
 
-const input =
-  "w-full rounded-md border border-foreground/20 bg-transparent px-3 py-2 text-base outline-none focus:border-foreground/60";
-const button = "w-full rounded-md bg-foreground px-3 py-2 font-medium text-background disabled:opacity-50";
+const input = ui.input;
+const button = `${ui.button} h-11 w-full text-sm`;
+const textButton = "text-xs font-bold text-accent-soft transition hover:text-ink disabled:opacity-50";
 
 export function LoginForm({ next }: { next?: string }) {
   const [state, action, pending] = useActionState<LoginState, FormData>(login, { step: "email" });
@@ -14,7 +15,7 @@ export function LoginForm({ next }: { next?: string }) {
     return (
       <form key="email" action={action} className="flex flex-col gap-3">
         {next && <input type="hidden" name="next" value={next} />}
-        <label htmlFor="email" className="text-sm font-medium">
+        <label htmlFor="email" className={ui.label}>
           Correo
         </label>
         <input
@@ -28,14 +29,14 @@ export function LoginForm({ next }: { next?: string }) {
           className={input}
         />
         {state.error && (
-          <p className="text-sm text-red-600" role="alert">
+          <p className={ui.error} role="alert">
             {state.error}
           </p>
         )}
         <button type="submit" name="intent" value="send" disabled={pending} className={button}>
           {pending ? "Enviando…" : "Mandar código"}
         </button>
-        <p className="text-sm opacity-70">Te mandamos un código de 6 dígitos. No necesitas contraseña.</p>
+        <p className={ui.muted}>Te mandamos un código de 6 dígitos. No necesitas contraseña.</p>
       </form>
     );
   }
@@ -43,11 +44,11 @@ export function LoginForm({ next }: { next?: string }) {
   return (
     <form key="code" action={action} className="flex flex-col gap-3">
       {next && <input type="hidden" name="next" value={next} />}
-      <p className="text-sm">
-        Mandamos un código a <strong>{state.email}</strong>. Revisa también la carpeta de spam.
+      <p className="text-sm text-muted">
+        Mandamos un código a <strong className="text-ink">{state.email}</strong>. Revisa también la carpeta de spam.
       </p>
       <input type="hidden" name="email" value={state.email} />
-      <label htmlFor="code" className="text-sm font-medium">
+      <label htmlFor="code" className={ui.label}>
         Código
       </label>
       <input
@@ -57,21 +58,21 @@ export function LoginForm({ next }: { next?: string }) {
         inputMode="numeric"
         maxLength={7}
         autoFocus
-        className={`${input} tracking-[0.4em]`}
+        className={`${input} text-center text-lg font-bold tracking-[0.4em]`}
       />
       {state.error && (
-        <p className="text-sm text-red-600" role="alert">
+        <p className={ui.error} role="alert">
           {state.error}
         </p>
       )}
       <button type="submit" name="intent" value="verify" disabled={pending} className={button}>
         {pending ? "Verificando…" : "Entrar"}
       </button>
-      <div className="flex justify-between text-sm">
-        <button type="submit" name="intent" value="send" disabled={pending} className="underline opacity-70">
+      <div className="flex justify-between">
+        <button type="submit" name="intent" value="send" disabled={pending} className={textButton}>
           Mandar otro código
         </button>
-        <button type="submit" name="intent" value="restart" disabled={pending} className="underline opacity-70">
+        <button type="submit" name="intent" value="restart" disabled={pending} className={textButton}>
           Usar otro correo
         </button>
       </div>

@@ -45,12 +45,16 @@ El esquema implementado está en `supabase/migrations/` y manda sobre este resum
 
 - `card_printing`: id de Scryfall, oracle id, nombre, set, número, imagen, rareza.
 - `price_reference`: printing, fuente (ck, tcgplayer, cardmarket), moneda, valor, acabado (nonfoil, foil, etched), fecha. Solo el último valor, sin historial.
-- `profile`: usuario, tipo (jugador, vendedor, tienda), plan, verificado. Las calificaciones van en la tabla `rating`.
+- `profile`: usuario, nombre visible, tipo (jugador, vendedor, tienda), plan, verificado, WhatsApp. El WhatsApp es de lectura pública y la UI todavía no lo pide (ver 06); el tipo no se puede cambiar desde la UI. Las calificaciones van en la tabla `rating`.
 - `store`: perfil, dirección, WhatsApp, referencia de precio declarada, `inventory_updated_at`.
 - `inventory_item`: vendedor, printing, condición, idioma, foil, cantidad, precio MXN.
 - `want_list` / `want_list_item`: dueño, pública sí/no; oracle id o printing específico, cantidad, condición mínima, foil sí/no/indistinto.
 - `offer`: want list, vendedor, precio total del lote, cartas incluidas, estado.
 - `rating`: de quién, a quién, oferta relacionada, puntuación, comentario.
+
+## Marketplace
+
+`/dashboard` muestra el inventario agrupado por carta (`src/lib/marketplace/listings.ts`). `src/supabase/marketplace.ts` trae las 200 ofertas más recientes con existencias, más todas las de las cartas que el usuario tiene en sus want lists, con los datos del vendedor y de su tienda. `/listas` usa la misma consulta solo con las cartas buscadas. El conteo de ofertas ahí no aplica condición mínima ni foil; eso lo hace el matching de `/listas/<id>`.
 
 ## Reglas de matching
 

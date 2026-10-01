@@ -13,6 +13,7 @@ Lee `docs/` antes de proponer cambios de alcance. Resumen de lo que no se negoci
 ## Convenciones
 
 - UI, documentación y mensajes de commit en español.
+- Identidad visual única: tema oscuro con acento violeta (diseño de Figma). Usa los tokens de `src/app/globals.css`, las clases de `src/app/ui.ts` y los componentes de `src/app/_components/`; las páginas con sesión van en `src/app/(app)/`. Nada de colores sueltos de Tailwind ni estilos propios por página. Detalle en `docs/06-decisiones-abiertas.md`.
 - Precios mostrados en MXN; guardar también el valor original y su moneda.
 - Stack: Next.js + TypeScript en Cloudflare Workers (OpenNext) y Supabase. Detalle y razones en `docs/06-decisiones-abiertas.md`.
 - La lógica de dominio (parsers, matching) vive en `src/lib/` como TypeScript puro con pruebas en vitest; no debe depender de Next ni de Supabase.

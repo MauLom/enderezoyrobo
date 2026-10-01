@@ -14,16 +14,17 @@ export function NewListForm() {
   const preview = state.preview;
 
   return (
-    <form action={action} className="flex flex-col gap-6">
+    <form action={action} className="flex max-w-3xl flex-col gap-6">
+      <div className={`${ui.card} flex flex-col gap-5`}>
       <div className="flex flex-col gap-2">
-        <label htmlFor="name" className="text-sm font-medium">
+        <label htmlFor="name" className={ui.label}>
           Nombre de la lista
         </label>
         <input id="name" name="name" defaultValue={state.name} placeholder="Mi deck de Commander" className={ui.input} />
       </div>
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="text" className="text-sm font-medium">
+        <label htmlFor="text" className={ui.label}>
           Cartas
         </label>
         <textarea
@@ -32,12 +33,13 @@ export function NewListForm() {
           rows={12}
           defaultValue={state.text}
           placeholder={EXAMPLE}
-          className={`${ui.input} font-mono text-sm`}
+          className={`${ui.input} font-mono text-[13px] leading-relaxed`}
         />
         <p className={ui.muted}>
           Una carta por línea, como las exporta Moxfield, Arena o ManaBox. Set y número son opcionales: sin ellos
-          aceptamos cualquier impresión. <code>*F*</code> al final pide foil.
+          aceptamos cualquier impresión. <code className="text-accent-text">*F*</code> al final pide foil.
         </p>
+      </div>
       </div>
 
       {state.error && (
@@ -53,8 +55,8 @@ export function NewListForm() {
           </h2>
 
           {preview.problems.length > 0 && (
-            <div className="rounded-md border border-red-500/40 p-3 text-sm">
-              <p className="font-medium">Estas líneas no se van a guardar:</p>
+            <div className={ui.boxError}>
+              <p className="font-bold text-danger">Estas líneas no se van a guardar:</p>
               <ul className="mt-1 list-disc pl-5">
                 {preview.problems.map((p) => (
                   <li key={p.lineNumber}>
@@ -66,7 +68,7 @@ export function NewListForm() {
           )}
 
           {preview.warnings.length > 0 && (
-            <div className="rounded-md border border-amber-500/40 p-3 text-sm">
+            <div className={ui.boxWarn}>
               <ul className="list-disc pl-5">
                 {preview.warnings.map((w) => (
                   <li key={w.lineNumber}>
@@ -79,18 +81,18 @@ export function NewListForm() {
 
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {preview.items.map((item) => (
-              <li key={item.key} className="flex items-center gap-3 rounded-md border border-foreground/10 p-2">
+              <li key={item.key} className="flex items-center gap-3 rounded-lg border border-line bg-paper p-2">
                 {item.imageUri ? (
                   // eslint-disable-next-line @next/next/no-img-element -- imágenes de Scryfall sin optimizador
-                  <img src={item.imageUri} alt="" width={40} height={56} className="rounded-sm" loading="lazy" />
+                  <img src={item.imageUri} alt="" width={40} height={56} className={ui.cardThumb} loading="lazy" />
                 ) : (
-                  <div className="h-14 w-10 rounded-sm bg-foreground/10" />
+                  <div className={`h-14 w-10 ${ui.thumbPlaceholder}`} />
                 )}
-                <div className="min-w-0 text-sm">
-                  <p className="truncate font-medium">
+                <div className="min-w-0 text-xs">
+                  <p className="truncate font-bold">
                     {item.quantity}× {item.name}
                   </p>
-                  <p className="opacity-70">
+                  <p className="text-muted">
                     {item.setLabel}
                     {item.foil && " · foil"}
                   </p>
