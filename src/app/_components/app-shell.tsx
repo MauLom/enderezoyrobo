@@ -26,7 +26,13 @@ export function AppShell({ user, counts, children }: Props) {
   const searchParams = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("q") ?? "");
   const onMarketplace = pathname === "/dashboard";
-  const section = pathname.startsWith("/listas") ? "listas" : pathname === "/dashboard" ? "marketplace" : null;
+  const section = pathname.startsWith("/listas")
+    ? "listas"
+    : pathname.startsWith("/ofertas")
+      ? "ofertas"
+      : pathname === "/dashboard"
+        ? "marketplace"
+        : null;
   const userInitials = user ? initials(user.displayName) : null;
 
   function updateSearch(value: string) {
@@ -80,6 +86,12 @@ export function AppShell({ user, counts, children }: Props) {
             <Icon name="heart" size={19} /><span>Mis listas</span>
             {counts.lists > 0 && <b>{counts.lists}</b>}
           </Link>
+          {user && (
+            <Link href="/ofertas" className={`nav-item ${section === "ofertas" ? "active" : ""}`}>
+              <Icon name="inbox" size={19} /><span>Ofertas</span>
+              {counts.pendingOffers > 0 && <b title="Ofertas por responder">{counts.pendingOffers}</b>}
+            </Link>
+          )}
           <span className="nav-item soon" aria-disabled="true" title="Fuera del MVP">
             <Icon name="users" size={19} /><span>Comunidad</span><b>Pronto</b>
           </span>

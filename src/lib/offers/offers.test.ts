@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 import type { InventoryItem, WantItem } from "@/lib/matching/match";
-import { canChangeStatus, draftOffer, draftTotal, parseOfferForm, parseRating, ratingLabel } from "./offers";
+import {
+  canChangeStatus,
+  dealMessage,
+  draftOffer,
+  draftTotal,
+  offerActor,
+  parseOfferForm,
+  parseRating,
+  ratingLabel,
+} from "./offers";
 
 function want(id: string, oracleId: string, quantity: number): WantItem {
   return { id, oracleId, printingId: null, quantity, minCondition: "LP", foil: "any", language: null };
@@ -86,5 +95,26 @@ describe("calificaciones", () => {
   it("resume el promedio", () => {
     expect(ratingLabel([])).toBeNull();
     expect(ratingLabel([5, 4])).toBe("★ 4.5 (2)");
+  });
+});
+
+describe("offerActor", () => {
+  const offer = { sellerId: "ana", ownerId: "beto" };
+
+  it("distingue al dueño de la lista y al vendedor", () => {
+    expect(offerActor(offer, "beto")).toBe("owner");
+    expect(offerActor(offer, "ana")).toBe("seller");
+  });
+
+  it("null para quien no participa", () => {
+    expect(offerActor(offer, "carla")).toBeNull();
+  });
+});
+
+describe("dealMessage", () => {
+  it("menciona quién escribe, la lista y el total", () => {
+    expect(dealMessage("Beto", "Commander de Atraxa", "$560")).toBe(
+      'Hola, soy Beto de Mazo. Te escribo por la oferta aceptada de $560 por la lista "Commander de Atraxa".',
+    );
   });
 });

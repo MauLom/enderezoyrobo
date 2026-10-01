@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /** Íconos de trazo del diseño de la plataforma. */
-export type IconName = "home" | "search" | "store" | "heart" | "users" | "message" | "plus" | "chevron" | "map" | "spark" | "close" | "user" | "logout" | "copy" | "trash" | "edit";
+export type IconName = "home" | "search" | "store" | "heart" | "users" | "message" | "plus" | "chevron" | "map" | "spark" | "close" | "user" | "logout" | "copy" | "trash" | "edit" | "inbox";
 
 export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
   const paths: Record<IconName, ReactNode> = {
@@ -20,6 +20,7 @@ export function Icon({ name, size = 20 }: { name: IconName; size?: number }) {
     logout: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5M21 12H9" /></>,
     copy: <><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" /></>,
     trash: <><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14" /></>,
+    inbox: <><path d="M22 12h-6l-2 3h-4l-2-3H2" /><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1Z" /></>,
     edit: <><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></>,
   };
   return (

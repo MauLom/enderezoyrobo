@@ -28,6 +28,18 @@ export function canChangeStatus(from: OfferStatus, to: OfferStatus, actor: Offer
   return actor === "owner" ? to === "accepted" || to === "rejected" : to === "withdrawn";
 }
 
+/** Papel del usuario en una oferta: dueño de la lista o vendedor; null si no participa. */
+export function offerActor(offer: { sellerId: string; ownerId: string }, userId: string): OfferActor | null {
+  if (offer.ownerId === userId) return "owner";
+  if (offer.sellerId === userId) return "seller";
+  return null;
+}
+
+/** Mensaje para escribirle por WhatsApp a la otra parte de una oferta aceptada. */
+export function dealMessage(myName: string, listName: string, total: string): string {
+  return `Hola, soy ${myName} de Mazo. Te escribo por la oferta aceptada de ${total} por la lista "${listName}".`;
+}
+
 // Borrador ------------------------------------------------------------------------
 
 export type DraftLine = {
