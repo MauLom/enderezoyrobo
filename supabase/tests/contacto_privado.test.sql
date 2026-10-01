@@ -1,7 +1,7 @@
 -- WhatsApp privado (#2, decisión B de #1). Corre con npm run db:test.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(11);
 
 -- Vendedor (v) con oferta aceptada sobre la lista de un jugador (j); un tercero (t) sin relación.
 insert into auth.users (id, email) values
@@ -11,6 +11,8 @@ insert into auth.users (id, email) values
 insert into contact (profile_id, whatsapp) values
   ('00000000-0000-4000-8000-0000000000b1', '+528100000101'),
   ('00000000-0000-4000-8000-0000000000b2', '+528100000102');
+insert into store (profile_id, name, whatsapp) values
+  ('00000000-0000-4000-8000-0000000000b3', 'Tienda', '+528100000103');
 insert into want_list (id, owner_id, name, is_public) values
   ('00000000-0000-4000-8000-0000000000c1', '00000000-0000-4000-8000-0000000000b2', 'Lista', true);
 insert into offer (id, want_list_id, seller_id, total_mxn_cents, status) values
@@ -20,6 +22,10 @@ insert into offer (id, want_list_id, seller_id, total_mxn_cents, status) values
 -- Sin sesión (llave publicable).
 set local role anon;
 select is((select count(*) from contact)::int, 0, 'sin sesión no se lee ningún WhatsApp');
+select is(
+  (select whatsapp from store where profile_id = '00000000-0000-4000-8000-0000000000b3'), '+528100000103',
+  'el WhatsApp de una tienda siempre es público'
+);
 select throws_ok(
   $$select whatsapp_de_oferta('00000000-0000-4000-8000-0000000000d1')$$,
   '42501', null,

@@ -5,6 +5,7 @@ import { PageHeader } from "@/app/_components/page-header";
 import { ui } from "@/app/ui";
 import { CONDITIONS } from "@/lib/cards/condition";
 import { formatForeign, formatMxn, toMxnCents } from "@/lib/pricing/mxn";
+import { getDealContacts } from "@/supabase/contacts";
 import { getCurrentProfile } from "@/supabase/session";
 import { getWantListDetail, type WantListItemView } from "@/supabase/want-lists";
 import { deleteItem, deleteList, renameList, setListPublic, updateItem } from "../actions";
@@ -28,7 +29,8 @@ export default async function ListaPage({ params }: PageProps<"/listas/[id]">) {
   if (!list) notFound();
 
   const isOwner = profile?.id === list.ownerId;
-  const matching = computeMatching(list);
+  // Sin sesión (lista pública) solo se ven los WhatsApp de las tiendas.
+  const matching = computeMatching(list, profile ? await getDealContacts() : new Map());
   const cardCount = list.items.reduce((sum, i) => sum + i.quantity, 0);
   const best = matching.best;
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { noContactLabel } from "@/lib/contact/seller-contact";
 import { orderMessage, whatsappLink } from "@/lib/contact/whatsapp";
 import { type CardListing, initials, type MarketOffer } from "@/lib/marketplace/listings";
 import { formatMxn } from "@/lib/pricing/mxn";
@@ -21,7 +22,7 @@ export function offerDetail(offer: MarketOffer): string {
     .join(" · ");
 }
 
-/** Todas las ofertas de una carta, con contacto por WhatsApp cuando el vendedor lo tiene público. */
+/** Todas las ofertas de una carta, con WhatsApp de las tiendas y de los particulares con oferta aceptada. */
 export function OffersModal({ listing, onClose }: { listing: CardListing; onClose: () => void }) {
   return (
     <div className="modal-backdrop" onMouseDown={onClose}>
@@ -62,7 +63,12 @@ export function OffersModal({ listing, onClose }: { listing: CardListing; onClos
                 {link ? (
                   <a href={link} target="_blank" rel="noopener noreferrer">WhatsApp</a>
                 ) : (
-                  <span className="no-contact" title="Este vendedor no tiene WhatsApp público">Sin WhatsApp</span>
+                  <span
+                    className="no-contact"
+                    title={offer.isStore ? "Esta tienda no tiene WhatsApp registrado" : "El WhatsApp de un particular se comparte al aceptar una oferta"}
+                  >
+                    {noContactLabel(offer.isStore)}
+                  </span>
                 )}
               </div>
             );

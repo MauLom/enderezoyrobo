@@ -64,4 +64,4 @@ Implementación ([#2](https://github.com/MauLom/enderezoyrobo/issues/2)):
 - `store.whatsapp` sigue público: es el canal de la tienda.
 - Pruebas contra la base en `supabase/tests/contacto_privado.test.sql` (`npm run db:test`).
 
-Consecuencia: en matching y marketplace un vendedor particular sigue saliendo con "Sin WhatsApp"; es lo esperado hasta la fase 3.
+En marketplace y matching ([#5](https://github.com/MauLom/enderezoyrobo/issues/5)), `whatsapp_de_mis_tratos()` trae de una vez los números de todas las personas con las que el usuario tiene una oferta aceptada; con eso, un vendedor particular tiene botón de WhatsApp solo para quien ya cerró una oferta con él. Para los demás dice "Al aceptar oferta" (las tiendas sin número, "Sin WhatsApp"). La regla está en `src/lib/contact/seller-contact.ts`.

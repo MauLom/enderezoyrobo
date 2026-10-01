@@ -317,6 +317,11 @@ isOneToOne: false
 "show_trgm":
 { Args: { "": string }; Returns: (string)[]
                            },
+"whatsapp_de_mis_tratos":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "profile_id": string,"whatsapp": string
+            }[]
+                           },
 "whatsapp_de_oferta":
 { Args: { "p_offer_id": string }; Returns: string
                            }

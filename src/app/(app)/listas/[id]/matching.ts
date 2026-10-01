@@ -1,3 +1,4 @@
+import { sellerWhatsapp } from "@/lib/contact/seller-contact";
 import { bestCombinations, type InventoryItem, matchByStore, matchesWant, type MatchResult, type WantItem } from "@/lib/matching/match";
 import type { InventoryRow } from "@/supabase/inventory";
 import type { WantListDetail } from "@/supabase/want-lists";
@@ -13,7 +14,8 @@ export type ListMatching = {
   sellersPerItem: Map<string, number>;
 };
 
-export function computeMatching(list: WantListDetail): ListMatching {
+/** `dealContacts`: WhatsApp de quienes tienen una oferta aceptada con quien mira (ver getDealContacts). */
+export function computeMatching(list: WantListDetail, dealContacts: ReadonlyMap<string, string>): ListMatching {
   const want: WantItem[] = list.items.map((i) => ({
     id: i.id,
     oracleId: i.oracleId,
@@ -36,7 +38,11 @@ export function computeMatching(list: WantListDetail): ListMatching {
   }));
 
   const sellers = new Map<string, SellerInfo>();
-  for (const r of list.inventory) if (!sellers.has(r.sellerId)) sellers.set(r.sellerId, r);
+  for (const r of list.inventory) {
+    if (sellers.has(r.sellerId)) continue;
+    const whatsapp = sellerWhatsapp({ id: r.sellerId, isStore: r.isStore, storeWhatsapp: r.whatsapp }, dealContacts);
+    sellers.set(r.sellerId, { ...r, whatsapp });
+  }
 
   const sellersPerItem = new Map<string, number>();
   for (const w of want) {

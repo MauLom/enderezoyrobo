@@ -1,5 +1,7 @@
 import "server-only";
+import { sellerWhatsapp } from "@/lib/contact/seller-contact";
 import { type CardListing, groupListings, type MarketOffer, type WantedCard } from "@/lib/marketplace/listings";
+import { getDealContacts } from "./contacts";
 import type { Client } from "./query";
 import { createClient } from "./server";
 
@@ -21,8 +23,9 @@ export type MarketplaceData = {
  */
 export async function getMarketplace(ownerId: string, { recent: withRecent = true } = {}): Promise<MarketplaceData> {
   const supabase = await createClient();
-  const [wanted, recent] = await Promise.all([
+  const [wanted, contacts, recent] = await Promise.all([
     loadWanted(supabase, ownerId),
+    getDealContacts(),
     withRecent
       ? supabase
           .from("inventory_item")
@@ -65,8 +68,7 @@ export async function getMarketplace(ownerId: string, { recent: withRecent = tru
       sellerName: (isStore ? store?.name : null) ?? r.profile?.display_name ?? "Vendedor",
       isStore,
       verified: store?.verified_at != null,
-      // Solo el WhatsApp de las tiendas es público (ver docs/06, privacidad del WhatsApp).
-      whatsapp: isStore ? (store?.whatsapp ?? null) : null,
+      whatsapp: sellerWhatsapp({ id: r.seller_id, isStore, storeWhatsapp: store?.whatsapp ?? null }, contacts),
       location: store?.address ?? null,
       updatedAt: (isStore ? store?.inventory_updated_at : null) ?? r.updated_at,
     };
