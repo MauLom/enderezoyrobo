@@ -7,6 +7,7 @@ import { initials } from "@/lib/marketplace/listings";
 import { getMyWhatsapp } from "@/supabase/contacts";
 import { requireProfile } from "@/supabase/session";
 import { signOut } from "./actions";
+import { ContactForm } from "./contact-form";
 import { KindForm } from "./kind-form";
 import { ProfileForm } from "./profile-form";
 
@@ -29,6 +30,18 @@ export default async function CuentaPage() {
             </div>
           </div>
           <ProfileForm displayName={profile.displayName} />
+        </section>
+        <section className={`${ui.card} flex flex-col gap-5`}>
+          <div className="flex items-center gap-3">
+            <div className="avatar"><Icon name="message" size={16} /></div>
+            <div>
+              <p className={ui.h3}>Contacto</p>
+              <p className={ui.muted}>
+                {profile.deliveryZone ? `Entregas en ${profile.deliveryZone}.` : "Para cerrar tratos por WhatsApp."}
+              </p>
+            </div>
+          </div>
+          <ContactForm whatsapp={whatsapp} deliveryZone={profile.deliveryZone} />
         </section>
         <section className={`${ui.card} flex flex-col gap-4`}>
           <div className="flex items-start justify-between gap-3">
