@@ -18,28 +18,47 @@ La fase 1 va adelantada en el lado del comprador y atrasada en el de la tienda.
 - **A medias:** la cuenta. `/cuenta` permite cambiar el nombre visible y salir, y desde hoy el menú lateral tiene "Mi perfil" y "Salir". Faltan los datos de contacto (WhatsApp), la zona y el tipo de cuenta (jugador, vendedor o tienda).
 - **Sin empezar:** todo el flujo de la tienda (registrarse, verificarla, subir inventario), la pantalla de ofertas y el despliegue a producción.
 
-Lo que bloquea el piloto de noviembre es el flujo de la tienda: sin él no hay inventario real que buscar. El detalle por punto del MVP está en [03](03-mvp.md#estado-2026-09-30).
+Lo que bloquea el piloto de noviembre es el flujo de la tienda: sin él no hay inventario real que buscar. El detalle por punto del MVP está en [03](03-mvp.md#estado-2026-09-30) y el trabajo pendiente, en los issues (abajo).
 
-## Plan de trabajo de octubre
+## Plan de trabajo
 
-En orden. Cada bloque incluye su pantalla (con la identidad de la plataforma), sus casos en el seed y en [08](08-validacion.md), y pruebas de su lógica en `src/lib/`.
+El trabajo vive en los [issues de GitHub](https://github.com/MauLom/enderezoyrobo/issues), agrupados en un milestone por fase (la vista de [milestones](https://github.com/MauLom/enderezoyrobo/milestones) es el roadmap). Cada issue trae contexto, alcance, criterios de aceptación y de qué otros depende, para que varias personas avancen en paralelo. Las etiquetas indican el área (`cuenta`, `tienda`, `inventario`, `listas`, `ofertas`, `precios`, `infra`, `ui`), si requiere una `decisión` y si `bloquea-piloto`.
 
-| # | Bloque | Qué incluye | Depende de | Para cuándo |
-| --- | --- | --- | --- | --- |
-| 1 | Decidir la privacidad del WhatsApp | Elegir una de las opciones de [06](06-decisiones-abiertas.md#pendiente-privacidad-del-whatsapp) | — | 3 oct |
-| 2 | Cuenta completa | En `/cuenta`: WhatsApp (con la regla de privacidad del bloque 1), zona o municipio de entrega, tipo de cuenta (jugador o vendedor; tienda se pide en el bloque 3). Validación del número con `src/lib/contact/whatsapp.ts`. Si hace falta, migración para mover el WhatsApp del jugador a una tabla privada | 1 | 7 oct |
-| 3 | Registro de tienda | Formulario "Registrar mi tienda" en `/cuenta`: nombre, dirección, WhatsApp, referencia de precio ("SCG −10 %"). Crea el renglón en `store` sin verificar. Página pública de la tienda con su insignia | 2 | 11 oct |
-| 4 | Verificación manual | Cómo verifica el fundador (consulta SQL documentada o pantalla mínima de administración protegida); qué se revisa antes de verificar | 3 | 12 oct |
-| 5 | Inventario por CSV | Pantalla "Mi inventario": descargar plantilla, subir CSV, vista previa con errores por línea (el parser ya existe), reemplazar el inventario y actualizar `inventory_updated_at`. Ver el inventario cargado | 3 | 18 oct |
-| 6 | Despliegue | Cloudflare Workers con OpenNext, Supabase en la nube, SMTP con Resend, plantillas de correo y URL del sitio; correr la sincronización diaria contra producción | — | 22 oct |
-| 7 | Invitar a las tiendas | Dar de alta a las 5 tiendas conocidas, acompañarlas a subir su primer CSV | 5, 6 | 31 oct (revisión) |
-| 8 | CSV de ManaBox/Moxfield para want lists | Conseguir exports reales, escribir el parser y aceptarlo en "Nueva want list" | — | Noviembre, si hay tiempo |
-| 9 | Precios de Cardmarket y Card Kingdom | Mostrar Cardmarket (ya está en la base); cruzar IDs de MTGJSON para Card Kingdom | — | Noviembre |
-| 10 | Ofertas sobre listas públicas | Botón "Hacer oferta por el lote", bandeja de ofertas recibidas y enviadas, aceptar, rechazar y retirar (la lógica ya existe en `src/lib/offers/`) | 2 | Diciembre (fase 3) |
+Para tomar un issue: asignártelo, trabajar en una rama y abrir un PR que diga `Cierra #N`. Antes de cerrar, lo que pide `CLAUDE.md` (pruebas, lint, typecheck, identidad visual, casos en el seed y en [08](08-validacion.md)).
 
-Fuera de este plan (ver [03](03-mvp.md#fuera-fases-posteriores)): comunidad, mensajería propia, recomendaciones, ubicación por distancia, subastas y pagos. Comunidad y Mensajes se quedan en el menú como "Pronto".
+### Fase 1 · Construir (octubre)
 
-Pendiente sin fecha: el nombre definitivo y el dominio ([06](06-decisiones-abiertas.md#nombre)); hace falta antes del despliegue del bloque 6 si se quiere un dominio propio.
+Ruta crítica del piloto, en orden: privacidad del WhatsApp → registro de tienda → verificación → inventario por CSV → despliegue → alta de las 5 tiendas.
+
+| Issue | Qué | Depende de | Para cuándo |
+| --- | --- | --- | --- |
+| [#1](https://github.com/MauLom/enderezoyrobo/issues/1) | [Decisión] Privacidad del WhatsApp | — | 3 oct |
+| [#2](https://github.com/MauLom/enderezoyrobo/issues/2) | Mover el WhatsApp a una tabla con RLS propia | #1 | 5 oct |
+| [#3](https://github.com/MauLom/enderezoyrobo/issues/3) | Datos de contacto y zona en `/cuenta` | #2 | 7 oct |
+| [#4](https://github.com/MauLom/enderezoyrobo/issues/4) | Tipo de cuenta: jugador o vendedor | — | 7 oct |
+| [#5](https://github.com/MauLom/enderezoyrobo/issues/5) | Contactar a vendedores particulares | #2 | 9 oct |
+| [#6](https://github.com/MauLom/enderezoyrobo/issues/6) | Registro de tienda desde `/cuenta` | — | 11 oct |
+| [#7](https://github.com/MauLom/enderezoyrobo/issues/7) | Página pública de la tienda | #6 | 14 oct |
+| [#8](https://github.com/MauLom/enderezoyrobo/issues/8) | Verificación manual de tiendas | #6 | 12 oct |
+| [#9](https://github.com/MauLom/enderezoyrobo/issues/9) | Guardar el inventario desde CSV | #6 | 16 oct |
+| [#10](https://github.com/MauLom/enderezoyrobo/issues/10) | Pantalla "Mi inventario" | #9 | 18 oct |
+| [#12](https://github.com/MauLom/enderezoyrobo/issues/12) | [Decisión] Nombre y dominio | — | 15 oct |
+| [#13](https://github.com/MauLom/enderezoyrobo/issues/13) | Desplegar a Cloudflare con Supabase en la nube | #12 (deseable) | 22 oct |
+| [#14](https://github.com/MauLom/enderezoyrobo/issues/14) | Correo de producción con Resend | #13 | 22 oct |
+| [#15](https://github.com/MauLom/enderezoyrobo/issues/15) | Sincronización diaria contra producción | #13 | 24 oct |
+| [#16](https://github.com/MauLom/enderezoyrobo/issues/16) | Dar de alta a las 5 tiendas del piloto | #8, #10, #13, #14 | 31 oct (revisión) |
+
+Se pueden trabajar en paralelo desde el día uno: #1 (decisión), #4, #6 y luego #7, #9 y #10 (la vista previa no necesita el guardado), y #12–#13 (infraestructura).
+
+### Fase 2 · Piloto con tiendas (noviembre)
+
+#11 ver y ajustar el inventario, #17 want list desde CSV de ManaBox/Moxfield, #18 precios de Cardmarket, #19 precios de Card Kingdom, #20 "Mis listas" con las reglas del matching, #21 recordatorio semanal a tiendas y #22 métricas de go/no-go. Más lo que salga del uso real de las tiendas.
+
+### Fase 3 · Abrir y cobrar (diciembre)
+
+#23 hacer oferta por el lote, #24 bandeja de ofertas y calificaciones, #25 [Decisión] oferta de lanzamiento y #26 planes de pago.
+
+Fuera del plan (ver [03](03-mvp.md#fuera-fases-posteriores)): comunidad, mensajería propia, recomendaciones, ubicación por distancia, subastas y pagos de tratos. Comunidad y Mensajes se quedan en el menú como "Pronto".
 
 ## Criterios de go/no-go (4 de enero de 2027)
 

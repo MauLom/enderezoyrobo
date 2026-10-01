@@ -55,7 +55,7 @@ El diseño de Figma del marketplace (tema oscuro, acento violeta, barra superior
 
 `profile.whatsapp` y `store.whatsapp` son públicos, porque la política de lectura de ambas tablas es `using (true)`. Para una tienda está bien. Para un jugador, su número no debería verse hasta que haya una oferta de por medio. Hay que decidirlo antes de pedir el número en la UI. Por eso `/cuenta` todavía no lo pide.
 
-Consecuencia actual: los botones de WhatsApp (matching y marketplace) solo usan `store.whatsapp`, así que un vendedor sin tienda aparece con "Sin WhatsApp" y no hay forma de contactarlo. Tampoco hay dónde capturar el número: `/cuenta` solo tiene el nombre visible. Es el bloque 1 del [plan de octubre](04-plan-y-criterios.md#plan-de-trabajo-de-octubre) porque la cuenta completa depende de esto.
+Consecuencia actual: los botones de WhatsApp (matching y marketplace) solo usan `store.whatsapp`, así que un vendedor sin tienda aparece con "Sin WhatsApp" y no hay forma de contactarlo. Tampoco hay dónde capturar el número: `/cuenta` solo tiene el nombre visible. Es el issue [#1](https://github.com/MauLom/enderezoyrobo/issues/1), primero del [plan](04-plan-y-criterios.md#plan-de-trabajo), porque la cuenta completa depende de esto.
 
 Opciones:
 

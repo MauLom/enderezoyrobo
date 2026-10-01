@@ -16,12 +16,12 @@ El MVP responde una sola pregunta: ¿qué tiendas de Monterrey tienen las cartas
 
 | # | Punto | Estado | Qué falta |
 | --- | --- | --- | --- |
-| 1 | Registro y verificación de tiendas | Parcial | Login con código, nombre visible y salir listos (`/cuenta`, "Mi perfil" y "Salir" en el menú). Faltan datos de contacto (WhatsApp, pendiente de la decisión de privacidad en 06), zona y tipo de cuenta; registrar una tienda y verificarla (hoy solo existen las del seed). Bloques 1–4 del [plan](04-plan-y-criterios.md#plan-de-trabajo-de-octubre). |
-| 2 | Importar want list | Parcial | Pegar texto (Moxfield/Arena) funciona con vista previa y avisos. Falta subir CSV de ManaBox/Moxfield (ver 07). Bloque 8 del plan. |
-| 3 | Inventario de tienda por CSV | Parcial | Parser y plantilla (`public/plantilla-inventario.csv`) listos y probados. Falta la pantalla para subirlo y guardarlo. Bloque 5 del plan. |
+| 1 | Registro y verificación de tiendas | Parcial | Login con código, nombre visible y salir listos (`/cuenta`, "Mi perfil" y "Salir" en el menú). Faltan datos de contacto (WhatsApp, pendiente de la decisión de privacidad en 06), zona y tipo de cuenta; registrar una tienda y verificarla (hoy solo existen las del seed). Issues #1–#8. |
+| 2 | Importar want list | Parcial | Pegar texto (Moxfield/Arena) funciona con vista previa y avisos. Falta subir CSV de ManaBox/Moxfield (ver 07). Issue #17. |
+| 3 | Inventario de tienda por CSV | Parcial | Parser y plantilla (`public/plantilla-inventario.csv`) listos y probados. Falta la pantalla para subirlo y guardarlo. Issues #9 y #10. |
 | 4 | Matching | Listo | Cobertura por vendedor y mejor combinación, con pedido armado por WhatsApp. |
-| 5 | Precios de referencia en MXN | Parcial | Se muestra solo TCGplayer (USD, no foil) convertido a MXN. Faltan Cardmarket (ya está en la base, no se muestra) y Card Kingdom (no se sincroniza). Bloque 9 del plan. |
-| 6 | Listas públicas y ofertas | Parcial | Hacer pública una lista y copiar su enlace funciona. Reglas de la oferta en `src/lib/offers/` (armar, validar, cambios de estado) y tabla `offer` con su trigger listos; el seed trae ofertas. Falta la pantalla: botón "hacer oferta" y bandeja para aceptar, rechazar o retirar. Bloque 10 del plan (diciembre). |
+| 5 | Precios de referencia en MXN | Parcial | Se muestra solo TCGplayer (USD, no foil) convertido a MXN. Faltan Cardmarket (ya está en la base, no se muestra) y Card Kingdom (no se sincroniza). Issues #18 y #19. |
+| 6 | Listas públicas y ofertas | Parcial | Hacer pública una lista y copiar su enlace funciona. Reglas de la oferta en `src/lib/offers/` (armar, validar, cambios de estado) y tabla `offer` con su trigger listos; el seed trae ofertas. Falta la pantalla: botón "hacer oferta" y bandeja para aceptar, rechazar o retirar. Issues #23 y #24 (diciembre). |
 | 7 | "Inventario actualizado hace X días" | Listo | Se marca en ámbar después de 30 días. |
 
 ## Marketplace (`/dashboard`)
