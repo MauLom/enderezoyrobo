@@ -19,6 +19,8 @@ export type ParsedLine = {
   collectorNumber: string | null;
   /** true si la línea trae *F* o *E* (etched); null si no dice nada. */
   foil: boolean | null;
+  /** ID de Scryfall de la impresión, cuando el formato lo trae (CSV de ManaBox). */
+  scryfallId?: string | null;
 };
 
 export type LineError = {

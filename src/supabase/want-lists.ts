@@ -1,6 +1,7 @@
 import "server-only";
 import type { Condition } from "@/lib/cards/condition";
 import { type CatalogPrinting, namesToLookup, type ResolveResult, resolveLines } from "@/lib/catalog/resolve";
+import { looksLikeCollectionCsv, parseCollectionCsv } from "@/lib/import/collection-csv";
 import { type LineError, parseDecklist } from "@/lib/import/decklist";
 import type { FoilPreference } from "@/lib/matching/match";
 import { type InventoryRow, toInventoryRow } from "./inventory";
@@ -11,8 +12,9 @@ import { createClient } from "./server";
 
 export type ResolvedDecklist = ResolveResult & { parseErrors: LineError[] };
 
+/** Texto estilo Moxfield/Arena o CSV de ManaBox/Moxfield; el formato se detecta por el encabezado. */
 export async function resolveDecklist(text: string): Promise<ResolvedDecklist> {
-  const { lines, errors } = parseDecklist(text);
+  const { lines, errors } = looksLikeCollectionCsv(text) ? parseCollectionCsv(text) : parseDecklist(text);
   const names = namesToLookup(lines);
   if (names.length === 0) return { items: [], warnings: [], unresolved: [], parseErrors: errors };
 

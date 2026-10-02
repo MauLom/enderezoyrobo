@@ -1,0 +1,4 @@
+Name,Set code,Set name,Collector number,Foil,Rarity,Quantity,ManaBox ID,Scryfall ID,Purchase price,Misprint,Altered,Condition,Language,Purchase price currency
+"Ragavan, Nimble Pilferer",MH2,Modern Horizons 2,138,Normal,Uncommon,2,mb_123456,0a1b2c3d-4e5f-6789-abcd-ef0123456789,18.99,No,No,near_mint,en,USD
+Lightning Bolt,M19,Core Set 2019,204,Foil,Common,1,mb_234567,1b2c3d4e-5f67-89ab-cdef-0123456789ab,5.50,No,No,mint,en,USD
+Sword of Fire and Ice,M21,Core Set 2021,287,Normal,Rare,1,mb_345678,2c3d4e5f-6789-abcd-ef01-23456789abcd,32.00,No,No,lightly_played,en,USD

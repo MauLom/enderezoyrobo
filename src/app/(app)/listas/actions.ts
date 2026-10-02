@@ -8,7 +8,8 @@ import { createClient } from "@/supabase/server";
 import { requireProfile } from "@/supabase/session";
 import { createWantList, resolveDecklist } from "@/supabase/want-lists";
 
-const MAX_LIST_TEXT = 20_000;
+// Un CSV de colección de ~2,000 filas.
+const MAX_LIST_TEXT = 300_000;
 
 export type PreviewItem = {
   key: string;

@@ -4,6 +4,7 @@ import type { ParsedLine } from "@/lib/import/decklist";
  * Resuelve las líneas de una lista (ya parseadas) contra impresiones del
  * catálogo buscadas por nombre. No consulta nada: recibe los candidatos.
  *
+ * - Con ID de Scryfall (CSV de ManaBox), se pide esa impresión si existe.
  * - Con set y número, se pide esa impresión exacta si existe; si no existe, se
  *   acepta cualquier impresión de la carta y se avisa.
  * - Sin set, se acepta cualquier impresión del mismo oracle id.
@@ -82,8 +83,8 @@ export function resolveLines(lines: ParsedLine[], candidates: CatalogPrinting[])
     const oracleId = mostPrinted(matches);
     const printings = matches.filter((p) => p.oracleId === oracleId);
 
-    let exact: CatalogPrinting | null = null;
-    if (line.setCode) {
+    let exact: CatalogPrinting | null = (line.scryfallId && printings.find((p) => p.id === line.scryfallId)) || null;
+    if (!exact && line.setCode) {
       exact =
         printings.find(
           (p) => p.setCode === line.setCode && (line.collectorNumber === null || p.collectorNumber === line.collectorNumber),
