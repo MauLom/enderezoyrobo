@@ -1,4 +1,5 @@
-# Sincroniza catálogo y precios de Scryfall y el tipo de cambio de Banxico.
+# Sincroniza catálogo y precios de Scryfall, el tipo de cambio de Banxico y
+# los precios de Card Kingdom de MTGJSON.
 # Scryfall publica su bulk diario alrededor de las 09:00 UTC.
 name: Sincronizar catálogo
 

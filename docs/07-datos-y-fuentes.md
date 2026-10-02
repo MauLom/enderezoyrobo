@@ -14,9 +14,10 @@ Verificar los términos de uso y los límites de cada fuente antes de implementa
 `scripts/sync-catalog.ts`, programado en `.github/workflows/sincronizar-catalogo.yml` a las 10:30 UTC (Scryfall publica su bulk cerca de las 09:00 UTC). También se puede lanzar a mano desde la pestaña Actions.
 
 - **Catálogo:** bulk "Default Cards" de Scryfall en JSONL comprimido (~80 MB), una impresión por línea: cada carta en inglés, o en su idioma impreso si solo existe en uno. Se omiten las cartas solo digitales y las *art series*. En la corrida del 2026-09-28: 106,621 impresiones guardadas y 11,785 omitidas.
-- **Precios:** los de Scryfall, TCGplayer (USD) y Cardmarket (EUR) por acabado. Los precios que Scryfall deja de reportar se borran. Card Kingdom desde MTGJSON queda pendiente: requiere cruzar los IDs de MTGJSON con los de Scryfall.
+- **Precios:** los de Scryfall, TCGplayer (USD) y Cardmarket (EUR) por acabado. Los precios que Scryfall deja de reportar se borran.
+- **Card Kingdom:** después del catálogo y del tipo de cambio, el job baja de MTGJSON `AllPricesToday.json.gz` (~5.5 MB) y `csv/cardIdentifiers.csv.gz` (~16 MB), cruza su `uuid` con el `scryfallId` y guarda el precio de venta (retail, no el de compra) por acabado (`src/lib/catalog/mtgjson.ts`). Se omiten las impresiones que no están en el catálogo; las cartas de dos caras traen un uuid por cara con el mismo id de Scryfall y cuentan una vez. Lo que MTGJSON deja de reportar se borra. En la corrida del 2026-10-02: 143,003 precios.
 - **Tipo de cambio:** API SIE de Banxico con token gratuito (`BANXICO_TOKEN`), series SF43718 (FIX, USD) y SF46410 (EUR). Todavía no se ha probado con un token real.
-- **Tamaño:** catálogo y precios ocupan ~85 MB de los 500 MB del plan gratuito de Supabase.
+- **Tamaño:** medido en la base local el 2026-10-02, la base completa pasó de 120 MB a 134 MB al agregar Card Kingdom. `price_reference` ocupa 75 MB (unas 437 mil filas: TCGplayer, Cardmarket y CK) y `card_printing` 46 MB, de los 500 MB del plan gratuito de Supabase.
 - **Conexión:** en GitHub Actions `DATABASE_URL` debe ser la cadena del *Session pooler* de Supabase, porque la conexión directa solo es IPv6 y los runners no tienen IPv6.
 - **Límites:** Scryfall pide un `User-Agent` propio y en ASCII (con acentos responde 403). GitHub desactiva los workflows programados después de 60 días sin actividad en el repositorio.
 
@@ -37,7 +38,7 @@ Implementada en `src/lib/catalog/resolve.ts`; la búsqueda en la base la hace `b
 
 ## Precio de referencia mostrado
 
-En el detalle de una lista, cada carta muestra el precio de TCGplayer en USD, no foil, convertido a MXN con el último tipo de cambio de Banxico. Si la carta pide una impresión exacta se usa el de esa impresión; si no, el más bajo entre todas sus impresiones (`resumen_cartas`). Sin tipo de cambio cargado se muestra en dólares. Cardmarket se calcula en la misma consulta pero todavía no se muestra.
+En el detalle de una lista, cada carta muestra el precio de TCGplayer y, debajo, el de Card Kingdom (CK), ambos en USD, no foil y convertidos a MXN con el último tipo de cambio de Banxico. Si la carta pide una impresión exacta se usa el de esa impresión; si no, el más bajo entre todas sus impresiones (`resumen_cartas`). Sin tipo de cambio cargado se muestran en dólares. Cardmarket se calcula en la misma consulta pero todavía no se muestra.
 
 ## Modelo de datos
 
@@ -55,7 +56,7 @@ El esquema implementado está en `supabase/migrations/` y manda sobre este resum
 
 ## Marketplace
 
-`/dashboard` muestra el inventario agrupado por carta (`src/lib/marketplace/listings.ts`). `src/supabase/marketplace.ts` trae las 200 ofertas más recientes con existencias, más todas las de las cartas que el usuario tiene en sus want lists, con los datos del vendedor y de su tienda. `/listas` usa la misma consulta solo con las cartas buscadas. El conteo de ofertas ahí no aplica condición mínima ni foil; eso lo hace el matching de `/listas/<id>`.
+`/dashboard` muestra el inventario agrupado por carta (`src/lib/marketplace/listings.ts`). `src/supabase/marketplace.ts` trae las 200 ofertas más recientes con existencias, más todas las de las cartas que el usuario tiene en sus want lists, con los datos del vendedor y de su tienda. `/listas` usa la misma consulta solo con las cartas buscadas. El conteo de ofertas ahí y en el panel "Tu wishlist" aplica las mismas reglas que el matching de `/listas/<id>` (`matchesWant`).
 
 ## Reglas de matching
 

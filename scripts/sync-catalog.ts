@@ -1,5 +1,6 @@
 /**
- * Sincronización diaria del catálogo, precios de referencia y tipo de cambio.
+ * Sincronización diaria del catálogo, precios de referencia (Scryfall y Card
+ * Kingdom vía MTGJSON) y tipo de cambio.
  * Corre en GitHub Actions (.github/workflows/sincronizar-catalogo.yml) o local:
  *
  *   npm run sync:catalogo                      # descarga el bulk de Scryfall
@@ -13,15 +14,18 @@ import { createReadStream } from "node:fs";
 import { createInterface } from "node:readline";
 import { Readable } from "node:stream";
 import type { ReadableStream as NodeReadableStream } from "node:stream/web";
-import { createGunzip } from "node:zlib";
+import { createGunzip, gunzipSync } from "node:zlib";
 import postgres from "postgres";
 import { banxicoUrl, parseBanxico } from "@/lib/catalog/banxico";
+import { type AllPricesToday, scryfallIdsByUuid, toCardKingdomPrices } from "@/lib/catalog/mtgjson";
+import { parseCsv } from "@/lib/import/csv";
 import { type PriceRow, type PrintingRow, type ScryfallCard, toPrices, toPrinting } from "@/lib/catalog/scryfall";
 
 // Scryfall pide identificarse con User-Agent y Accept. El User-Agent debe ser
 // ASCII: con acentos Scryfall responde 403.
 const SCRYFALL_HEADERS = { "User-Agent": "MazoTCG/0.1", Accept: "application/json" };
 const BATCH_SIZE = 1000;
+const MTGJSON = "https://mtgjson.com/api/v5";
 
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error("Falta DATABASE_URL");
@@ -139,10 +143,44 @@ async function syncExchangeRates() {
   console.log(`Tipo de cambio: ${rows.map((r) => `${r.currency} ${r.mxnPerUnit} (${r.asOf})`).join(", ")}`);
 }
 
+async function downloadGzip(url: string): Promise<string> {
+  const res = await fetch(url, { headers: { "User-Agent": SCRYFALL_HEADERS["User-Agent"] } });
+  if (!res.ok) throw new Error(`MTGJSON respondió ${res.status} al descargar ${url}`);
+  return gunzipSync(Buffer.from(await res.arrayBuffer())).toString("utf8");
+}
+
+/** Precios de Card Kingdom (MTGJSON); necesita el catálogo ya cargado para cruzar los IDs. */
+async function syncCardKingdom() {
+  console.log("Descargando precios e identificadores de MTGJSON");
+  const [pricesJson, identifiersCsv, printings] = await Promise.all([
+    downloadGzip(`${MTGJSON}/AllPricesToday.json.gz`),
+    downloadGzip(`${MTGJSON}/csv/cardIdentifiers.csv.gz`),
+    sql<{ id: string }[]>`select id from card_printing`,
+  ]);
+  const rows = toCardKingdomPrices(
+    JSON.parse(pricesJson) as AllPricesToday,
+    scryfallIdsByUuid(parseCsv(identifiersCsv)),
+    new Set(printings.map((p) => p.id)),
+  );
+  if (rows.length === 0) {
+    console.warn("MTGJSON no trajo precios de Card Kingdom: se conservan los anteriores");
+    return;
+  }
+
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    await upsertBatch([], rows.slice(i, i + BATCH_SIZE));
+  }
+  // Igual que con Scryfall: lo que MTGJSON ya no reporta se borra.
+  const oldest = rows.reduce((min, r) => (r.asOf < min ? r.asOf : min), rows[0].asOf);
+  const stale = await sql`delete from price_reference where source = 'ck' and as_of < ${oldest}`;
+  console.log(`Card Kingdom: ${rows.length} precios, ${stale.count} viejos borrados (fecha ${oldest})`);
+}
+
 async function main() {
   try {
     await syncScryfall(process.argv[2]);
     await syncExchangeRates();
+    await syncCardKingdom();
   } finally {
     await sql.end();
   }
