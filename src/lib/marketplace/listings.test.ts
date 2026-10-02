@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { groupListings, initials, type MarketOffer, searchListings, summarizeWishlist } from "./listings";
+import { groupListings, initials, type MarketOffer, searchListings, summarizeWishlist, type WantedCard } from "./listings";
 
 function offer(overrides: Partial<MarketOffer>): MarketOffer {
   return {
     id: "o1",
     oracleId: "sol-ring",
+    printingId: "sol-ring-c21",
     cardName: "Sol Ring",
     setCode: "C21",
     setName: "Commander 2021",
@@ -79,21 +80,63 @@ describe("searchListings", () => {
   });
 });
 
+function wantedCard(overrides: Partial<WantedCard>): WantedCard {
+  return {
+    listId: "a",
+    oracleId: "sol-ring",
+    name: "Sol Ring",
+    setCode: null,
+    quantity: 1,
+    printingId: null,
+    minCondition: "LP",
+    foil: "any",
+    language: null,
+    ...overrides,
+  };
+}
+
 describe("summarizeWishlist", () => {
   it("cuenta ofertas por carta, suma repetidas y pone primero las disponibles", () => {
     const listings = groupListings([offer({ id: "a" }), offer({ id: "b", sellerId: "guarida", priceMxnCents: 4000 })]);
     const cards = summarizeWishlist(
       [
-        { listId: "a", oracleId: "mana-vault", name: "Mana Vault", setCode: null, quantity: 1 },
-        { listId: "a", oracleId: "sol-ring", name: "Sol Ring", setCode: "C21", quantity: 1 },
-        { listId: "b", oracleId: "sol-ring", name: "Sol Ring", setCode: "C21", quantity: 2 },
+        wantedCard({ oracleId: "mana-vault", name: "Mana Vault" }),
+        wantedCard({ setCode: "C21" }),
+        wantedCard({ listId: "b", setCode: "C21", quantity: 2 }),
       ],
       listings,
     );
-    expect(cards).toEqual([
-      { oracleId: "sol-ring", name: "Sol Ring", setCode: "C21", quantity: 3, offerCount: 2, bestPriceMxnCents: 4000 },
-      { oracleId: "mana-vault", name: "Mana Vault", setCode: null, quantity: 1, offerCount: 0, bestPriceMxnCents: null },
+    expect(cards.map(({ listing, ...card }) => ({ ...card, offers: listing?.offers.map((o) => o.id) ?? [] }))).toEqual([
+      { oracleId: "sol-ring", name: "Sol Ring", setCode: "C21", quantity: 3, offerCount: 2, bestPriceMxnCents: 4000, offers: ["b", "a"] },
+      { oracleId: "mana-vault", name: "Mana Vault", setCode: null, quantity: 1, offerCount: 0, bestPriceMxnCents: null, offers: [] },
     ]);
+  });
+
+  it("solo cuenta las ofertas que cumplen condición mínima, foil, idioma e impresión", () => {
+    const listings = groupListings([
+      offer({ id: "dmg", condition: "DMG", priceMxnCents: 1000 }),
+      offer({ id: "foil", foil: true, priceMxnCents: 2000 }),
+      offer({ id: "ja", language: "ja", priceMxnCents: 3000 }),
+      offer({ id: "otra", printingId: "sol-ring-cmm", priceMxnCents: 3500 }),
+      offer({ id: "ok", priceMxnCents: 6000 }),
+    ]);
+    const card = (w: Partial<WantedCard>) => summarizeWishlist([wantedCard(w)], listings)[0];
+
+    expect(card({}).offerCount).toBe(4);
+    expect(card({}).bestPriceMxnCents).toBe(2000);
+    expect(card({ foil: "no", language: "en", printingId: "sol-ring-c21" }).listing?.offers.map((o) => o.id)).toEqual(["ok"]);
+    expect(card({ minCondition: "NM", foil: "yes" }).bestPriceMxnCents).toBe(2000);
+    expect(card({ minCondition: "NM", foil: "yes", language: "ja" })).toMatchObject({ offerCount: 0, bestPriceMxnCents: null, listing: null });
+  });
+
+  it("una carta en dos listas cuenta las ofertas que sirven a cualquiera de ellas", () => {
+    const listings = groupListings([offer({ id: "nm" }), offer({ id: "foil", foil: true }), offer({ id: "hp", condition: "HP" })]);
+    const [card] = summarizeWishlist(
+      [wantedCard({ minCondition: "NM", foil: "no" }), wantedCard({ listId: "b", foil: "yes" })],
+      listings,
+    );
+    expect(card.offerCount).toBe(2);
+    expect(card.listing?.sellerCount).toBe(1);
   });
 });
 

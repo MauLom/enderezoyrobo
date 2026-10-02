@@ -9,8 +9,8 @@ import { daysAgoLabel, formatMxn } from "@/lib/pricing/mxn";
 import type { WantListSummary } from "@/supabase/want-lists";
 
 /**
- * Resumen de una lista: cada carta con cuántas ofertas hay y el mejor precio.
- * No aplica condición mínima ni foil; eso lo hace el matching en /listas/<id>.
+ * Resumen de una lista: cada carta con cuántas ofertas cumplen lo que pide la
+ * lista (mismas reglas que el matching de /listas/<id>) y el mejor precio.
  */
 export function ListPreview({ list, wanted, listings }: { list: WantListSummary; wanted: WantedCard[]; listings: CardListing[] }) {
   const [selected, setSelected] = useState<CardListing | null>(null);
@@ -38,7 +38,7 @@ export function ListPreview({ list, wanted, listings }: { list: WantListSummary;
             key={card.oracleId}
             className="list-row"
             disabled={card.offerCount === 0}
-            onClick={() => setSelected(listings.find((l) => l.oracleId === card.oracleId) ?? null)}
+            onClick={() => setSelected(card.listing)}
           >
             <span className="list-qty">{card.quantity}×</span>
             <span className="list-name">
