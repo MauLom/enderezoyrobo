@@ -1,4 +1,5 @@
 import type { Condition } from "@/lib/cards/condition";
+import { type FoilPreference, matchesWant } from "@/lib/matching/match";
 
 /**
  * Vista de marketplace: el inventario de tiendas y vendedores agrupado por
@@ -8,6 +9,7 @@ import type { Condition } from "@/lib/cards/condition";
 export type MarketOffer = {
   id: string;
   oracleId: string;
+  printingId: string;
   cardName: string;
   setCode: string;
   setName: string;
@@ -61,27 +63,30 @@ export function groupListings(offers: MarketOffer[], wantedOracleIds: ReadonlySe
     else groups.set(offer.oracleId, [offer]);
   }
 
-  const listings = [...groups.entries()].map(([oracleId, group]): CardListing => {
-    group.sort(byPrice);
-    const best = group[0];
-    return {
-      oracleId,
-      name: best.cardName,
-      imageUri: best.imageUri ?? group.find((o) => o.imageUri)?.imageUri ?? null,
-      setCode: best.setCode,
-      setName: best.setName,
-      condition: best.condition,
-      bestPriceMxnCents: best.priceMxnCents,
-      offers: group,
-      sellerCount: new Set(group.map((o) => o.sellerId)).size,
-      wanted: wantedOracleIds.has(oracleId),
-      latestAt: group.reduce((max, o) => (o.updatedAt > max ? o.updatedAt : max), group[0].updatedAt),
-    };
-  });
+  const listings = [...groups.entries()].map(([oracleId, group]) => toListing(oracleId, group, wantedOracleIds.has(oracleId)));
 
   return listings.sort(
     (a, b) => Number(b.wanted) - Number(a.wanted) || b.latestAt.localeCompare(a.latestAt) || a.name.localeCompare(b.name),
   );
+}
+
+/** `offers` no debe venir vacío. */
+function toListing(oracleId: string, offers: MarketOffer[], wanted: boolean): CardListing {
+  const group = [...offers].sort(byPrice);
+  const best = group[0];
+  return {
+    oracleId,
+    name: best.cardName,
+    imageUri: best.imageUri ?? group.find((o) => o.imageUri)?.imageUri ?? null,
+    setCode: best.setCode,
+    setName: best.setName,
+    condition: best.condition,
+    bestPriceMxnCents: best.priceMxnCents,
+    offers: group,
+    sellerCount: new Set(group.map((o) => o.sellerId)).size,
+    wanted,
+    latestAt: group.reduce((max, o) => (o.updatedAt > max ? o.updatedAt : max), group[0].updatedAt),
+  };
 }
 
 /** Filtra por nombre sin distinguir mayúsculas ni acentos. Menos de 2 letras no filtra. */
@@ -102,35 +107,61 @@ export type WishlistCard = {
   quantity: number;
   offerCount: number;
   bestPriceMxnCents: number | null;
+  /** La carta con solo las ofertas que cumplen; null si ninguna cumple. */
+  listing: CardListing | null;
 };
 
-export type WantedCard = { listId: string; oracleId: string; name: string; setCode: string | null; quantity: number };
+export type WantedCard = {
+  listId: string;
+  oracleId: string;
+  name: string;
+  setCode: string | null;
+  quantity: number;
+  printingId: string | null;
+  minCondition: Condition;
+  foil: FoilPreference;
+  language: string | null;
+};
 
 /**
- * Cartas de las want lists del usuario con cuántas ofertas hay de cada una.
- * Una carta en varias listas se suma. Las que tienen ofertas van primero.
+ * Cartas de las want lists del usuario con cuántas ofertas cumplen lo que pide
+ * cada renglón (impresión, condición mínima, foil e idioma; ver matchesWant).
+ * Una carta en varias listas se suma y cuenta las ofertas que sirven a alguno
+ * de sus renglones. Las que tienen ofertas van primero.
  */
 export function summarizeWishlist(wanted: WantedCard[], listings: CardListing[]): WishlistCard[] {
   const byOracle = new Map(listings.map((l) => [l.oracleId, l]));
-  const cards = new Map<string, WishlistCard>();
+  const cards = new Map<string, Omit<WishlistCard, "offerCount" | "bestPriceMxnCents" | "listing"> & { offers: Set<MarketOffer> }>();
   for (const w of wanted) {
-    const current = cards.get(w.oracleId);
-    if (current) {
-      current.quantity += w.quantity;
-      continue;
+    const card = cards.get(w.oracleId) ?? { oracleId: w.oracleId, name: w.name, setCode: w.setCode, quantity: 0, offers: new Set() };
+    card.quantity += w.quantity;
+    for (const offer of byOracle.get(w.oracleId)?.offers ?? []) {
+      if (meetsWant(w, offer)) card.offers.add(offer);
     }
-    const listing = byOracle.get(w.oracleId);
-    cards.set(w.oracleId, {
-      oracleId: w.oracleId,
-      name: w.name,
-      setCode: w.setCode,
-      quantity: w.quantity,
-      offerCount: listing?.offers.length ?? 0,
-      bestPriceMxnCents: listing?.bestPriceMxnCents ?? null,
-    });
+    cards.set(w.oracleId, card);
   }
-  return [...cards.values()].sort(
-    (a, b) => Number(b.offerCount > 0) - Number(a.offerCount > 0) || a.name.localeCompare(b.name),
+  return [...cards.values()]
+    .map(({ offers, ...card }): WishlistCard => {
+      const listing = offers.size > 0 ? toListing(card.oracleId, [...offers], true) : null;
+      return { ...card, offerCount: offers.size, bestPriceMxnCents: listing?.bestPriceMxnCents ?? null, listing };
+    })
+    .sort((a, b) => Number(b.offerCount > 0) - Number(a.offerCount > 0) || a.name.localeCompare(b.name));
+}
+
+function meetsWant(w: WantedCard, offer: MarketOffer): boolean {
+  return matchesWant(
+    { id: "", oracleId: w.oracleId, printingId: w.printingId, quantity: w.quantity, minCondition: w.minCondition, foil: w.foil, language: w.language },
+    {
+      id: offer.id,
+      storeId: offer.sellerId,
+      oracleId: offer.oracleId,
+      printingId: offer.printingId,
+      condition: offer.condition,
+      language: offer.language,
+      foil: offer.foil,
+      quantity: offer.quantity,
+      priceMxnCents: offer.priceMxnCents,
+    },
   );
 }
 

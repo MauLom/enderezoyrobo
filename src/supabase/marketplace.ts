@@ -10,7 +10,7 @@ import { createClient } from "./server";
 const RECENT_LIMIT = 200;
 
 const OFFER_COLUMNS =
-  "id, condition, language, foil, quantity, price_mxn_cents, updated_at, seller_id, card_printing!inner(oracle_id, name, set_code, set_name, image_uri), profile(display_name, kind, store(name, verified_at, whatsapp, address, inventory_updated_at))";
+  "id, printing_id, condition, language, foil, quantity, price_mxn_cents, updated_at, seller_id, card_printing!inner(oracle_id, name, set_code, set_name, image_uri), profile(display_name, kind, store(name, verified_at, whatsapp, address, inventory_updated_at))";
 
 export type MarketplaceData = {
   listings: CardListing[];
@@ -55,6 +55,7 @@ export async function getMarketplace(ownerId: string, { recent: withRecent = tru
     return {
       id: r.id,
       oracleId: r.card_printing.oracle_id,
+      printingId: r.printing_id,
       cardName: r.card_printing.name,
       setCode: r.card_printing.set_code,
       setName: r.card_printing.set_name,
@@ -84,7 +85,7 @@ export async function getMarketplace(ownerId: string, { recent: withRecent = tru
 async function loadWanted(supabase: Client, ownerId: string): Promise<WantedCard[]> {
   const { data, error } = await supabase
     .from("want_list_item")
-    .select("want_list_id, oracle_id, quantity, card_printing(name, set_code), want_list!inner(owner_id)")
+    .select("want_list_id, oracle_id, printing_id, quantity, min_condition, foil, language, card_printing(name, set_code), want_list!inner(owner_id)")
     .eq("want_list.owner_id", ownerId);
   if (error) throw error;
   if (data.length === 0) return [];
@@ -104,5 +105,9 @@ async function loadWanted(supabase: Client, ownerId: string): Promise<WantedCard
     name: i.card_printing?.name ?? names.get(i.oracle_id) ?? "Carta desconocida",
     setCode: i.card_printing?.set_code ?? null,
     quantity: i.quantity,
+    printingId: i.printing_id,
+    minCondition: i.min_condition,
+    foil: i.foil,
+    language: i.language,
   }));
 }

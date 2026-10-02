@@ -42,11 +42,6 @@ export function DashboardApp({ firstName, listings, wanted }: DashboardProps) {
   const base = filter === "Todo" ? listings : listings.filter((l) => l.wanted);
   const visible = searchListings(base, search);
 
-  function openListing(oracleId: string) {
-    const listing = listings.find((l) => l.oracleId === oracleId);
-    if (listing) setSelected(listing);
-  }
-
   return (
     <>
       <PageHeader
@@ -149,7 +144,7 @@ export function DashboardApp({ firstName, listings, wanted }: DashboardProps) {
                   className="wishlist-item"
                   key={card.oracleId}
                   disabled={card.offerCount === 0}
-                  onClick={() => openListing(card.oracleId)}
+                  onClick={() => setSelected(card.listing)}
                 >
                   <div className={`wish-thumb wish-${index % 3}`}><Icon name="spark" size={17} /></div>
                   <div className="wish-name">
