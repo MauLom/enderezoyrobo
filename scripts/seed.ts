@@ -1,6 +1,7 @@
 /**
- * Datos de prueba para validar flujos: tiendas, un vendedor, jugadores con want
- * lists, ofertas, contactos privados y una calificación. Requiere el catálogo cargado (sync:catalogo).
+ * Datos de prueba para validar flujos: tiendas (verificadas, pendientes y una
+ * rechazada), un vendedor, jugadores con want lists, ofertas, contactos
+ * privados, una calificación y un moderador. Requiere el catálogo cargado (sync:catalogo).
  *
  *   npm run seed                    # borra y vuelve a crear los datos de prueba
  *   npm run seed -- --limpiar       # solo borra los datos de prueba
@@ -40,7 +41,19 @@ type Person = {
   whatsapp?: string;
   /** Municipio de DELIVERY_ZONES (src/lib/account/validation.ts). */
   deliveryZone?: string;
-  store?: { name: string; address: string; whatsapp: string; priceNote: string; verified: boolean; updatedDaysAgo: number };
+  store?: {
+    name: string;
+    address: string;
+    whatsapp: string;
+    priceNote: string | null;
+    verified: boolean;
+    updatedDaysAgo: number;
+    registeredDaysAgo?: number;
+    /** Motivo de rechazo del staff (tabla store_rejection). */
+    rejection?: string;
+  };
+  /** Owner o moderador (tabla staff): ve /tiendas. */
+  staffRole?: "owner" | "moderator";
 };
 
 const PEOPLE: Person[] = [
@@ -89,6 +102,40 @@ const PEOPLE: Person[] = [
       updatedDaysAgo: 45,
     },
   },
+  {
+    // Recién registrada desde /cuenta, sin inventario: primera en "Por revisar" de /tiendas.
+    key: "nueva",
+    email: `tienda.nueva${SEED_DOMAIN}`,
+    displayName: "Dados y Mazos (prueba)",
+    kind: "store",
+    store: {
+      name: "Dados y Mazos (prueba)",
+      address: "Av. Lincoln 450, Mitras Centro, Monterrey",
+      whatsapp: "+528100000004",
+      priceNote: null,
+      verified: false,
+      updatedDaysAgo: 0,
+      registeredDaysAgo: 0,
+    },
+  },
+  {
+    // Rechazada por el staff: ve el motivo en /cuenta y, al corregir sus datos, vuelve a revisión.
+    key: "rechazada",
+    email: `tienda.rechazada${SEED_DOMAIN}`,
+    displayName: "Cartas Express (prueba)",
+    kind: "store",
+    store: {
+      name: "Cartas Express (prueba)",
+      address: "Centro",
+      whatsapp: "+528100000005",
+      priceNote: "TCGplayer",
+      verified: false,
+      updatedDaysAgo: 3,
+      registeredDaysAgo: 3,
+      rejection: "La dirección no dice calle ni número y el WhatsApp no contestó. Corrige la dirección y avísanos.",
+    },
+  },
+  { key: "moderador", email: `moderador${SEED_DOMAIN}`, displayName: "Moderador (prueba)", kind: "player", staffRole: "moderator" },
   { key: "ana", email: `vendedora.ana${SEED_DOMAIN}`, displayName: "Ana (prueba)", kind: "seller", whatsapp: "+528100000010", deliveryZone: "San Nicolás de los Garza" },
   { key: "beto", email: `jugador.beto${SEED_DOMAIN}`, displayName: "Beto (prueba)", kind: "player", whatsapp: "+528100000011", deliveryZone: "Monterrey" },
   { key: "carla", email: `jugadora.carla${SEED_DOMAIN}`, displayName: "Carla (prueba)", kind: "player" },
@@ -259,10 +306,18 @@ async function seed(tx: Tx) {
     }
     const store = person.store;
     if (store) {
-      await tx`
-        insert into store (profile_id, name, address, whatsapp, price_reference_note, verified_at, inventory_updated_at)
+      const [{ id: storeId }] = await tx<{ id: string }[]>`
+        insert into store (profile_id, name, address, whatsapp, price_reference_note, verified_at, inventory_updated_at, created_at)
         values (${ids[person.key]}, ${store.name}, ${store.address}, ${store.whatsapp}, ${store.priceNote},
-                ${store.verified ? tx`now()` : null}, now() - make_interval(days => ${store.updatedDaysAgo}))`;
+                ${store.verified ? tx`now()` : null}, now() - make_interval(days => ${store.updatedDaysAgo}),
+                now() - make_interval(days => ${store.registeredDaysAgo ?? 60}))
+        returning id`;
+      if (store.rejection) {
+        await tx`insert into store_rejection (store_id, reason) values (${storeId}, ${store.rejection})`;
+      }
+    }
+    if (person.staffRole) {
+      await tx`insert into staff (profile_id, role) values (${ids[person.key]}, ${person.staffRole})`;
     }
   }
 

@@ -11,7 +11,7 @@ import { Brand } from "./brand";
 import { Icon } from "./icon";
 
 type Props = {
-  user: { displayName: string; email: string | null; kind: AccountKind } | null;
+  user: { displayName: string; email: string | null; kind: AccountKind; isStaff: boolean } | null;
   counts: ShellCounts;
   children: ReactNode;
 };
@@ -30,9 +30,11 @@ export function AppShell({ user, counts, children }: Props) {
     ? "listas"
     : pathname.startsWith("/ofertas")
       ? "ofertas"
-      : pathname === "/dashboard"
-        ? "marketplace"
-        : null;
+      : pathname.startsWith("/tiendas")
+        ? "tiendas"
+        : pathname === "/dashboard"
+          ? "marketplace"
+          : null;
   const userInitials = user ? initials(user.displayName) : null;
 
   function updateSearch(value: string) {
@@ -98,6 +100,15 @@ export function AppShell({ user, counts, children }: Props) {
           <span className="nav-item soon" aria-disabled="true" title="Los tratos se cierran por WhatsApp">
             <Icon name="message" size={19} /><span>Mensajes</span><b>Pronto</b>
           </span>
+          {user?.isStaff && (
+            <>
+              <div className="nav-label">Administración</div>
+              <Link href="/tiendas" className={`nav-item ${section === "tiendas" ? "active" : ""}`}>
+                <Icon name="shield" size={19} /><span>Tiendas</span>
+                {counts.pendingStores > 0 && <b title="Tiendas por revisar">{counts.pendingStores}</b>}
+              </Link>
+            </>
+          )}
           {user && (
             <>
               <div className="nav-label">Cuenta</div>

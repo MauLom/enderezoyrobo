@@ -19,6 +19,7 @@
     "db:test": "supabase test db",
     "db:types": "supabase gen types typescript --local > src/supabase/database.types.ts",
     "seed": "tsx --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local scripts/seed.ts",
+    "staff": "tsx --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local scripts/staff.ts",
     "db:push": "tsx --env-file-if-exists=.env.local --env-file-if-exists=.env.development.local scripts/db-push.ts"
   },
   "dependencies": {

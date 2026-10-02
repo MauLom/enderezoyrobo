@@ -6,7 +6,7 @@ Plataforma para comprar y vender cartas de TCG en Monterrey. Subes tu want list 
 
 ## Estado
 
-Fase 1 (construir); plan de trabajo en [04](docs/04-plan-y-criterios.md#plan-de-trabajo) y en los [issues](https://github.com/MauLom/enderezoyrobo/issues) por [milestone](https://github.com/MauLom/enderezoyrobo/milestones). Hay andamiaje, esquema de base de datos, núcleo del dominio (parsers de listas e inventario, y matching) con pruebas, la sincronización diaria del catálogo y precios de Scryfall y Card Kingdom, el login con código por correo, una cuenta básica (nombre visible y salir) y el flujo del comprador: crear want lists pegando texto, ver qué tiendas las tienen con la mejor combinación y pedir por WhatsApp. Las ofertas sobre listas públicas tienen su lógica y su tabla, pero no pantalla. Falta completar la cuenta (WhatsApp, zona, tipo de cuenta), el flujo de la tienda (registro, verificación y subir inventario por CSV), el despliegue a producción y mostrar los precios de Cardmarket. Todas las pantallas comparten la identidad visual del diseño de Figma ([06](docs/06-decisiones-abiertas.md#identidad-visual-decidido-el-2026-09-30)). En `/dashboard` hay un marketplace con el diseño de Figma: inventario por carta, la wishlist del usuario y contacto por WhatsApp (ver [03](docs/03-mvp.md#marketplace-dashboard)). Detalle por punto en [03 - MVP](docs/03-mvp.md#estado-2026-09-30).
+Fase 1 (construir); plan de trabajo en [04](docs/04-plan-y-criterios.md#plan-de-trabajo) y en los [issues](https://github.com/MauLom/enderezoyrobo/issues) por [milestone](https://github.com/MauLom/enderezoyrobo/milestones). Hay andamiaje, esquema de base de datos, núcleo del dominio (parsers de listas e inventario, y matching) con pruebas, la sincronización diaria del catálogo y precios de Scryfall y Card Kingdom, el login con código por correo, una cuenta básica (nombre visible y salir), el registro de tiendas con su revisión en `/tiendas` y el flujo del comprador: crear want lists pegando texto, ver qué tiendas las tienen con la mejor combinación y pedir por WhatsApp. Las ofertas sobre listas públicas tienen su lógica y su tabla, pero no pantalla. Falta completar la cuenta (WhatsApp, zona, tipo de cuenta), subir el inventario de la tienda por CSV, el despliegue a producción y mostrar los precios de Cardmarket. Todas las pantallas comparten la identidad visual del diseño de Figma ([06](docs/06-decisiones-abiertas.md#identidad-visual-decidido-el-2026-09-30)). En `/dashboard` hay un marketplace con el diseño de Figma: inventario por carta, la wishlist del usuario y contacto por WhatsApp (ver [03](docs/03-mvp.md#marketplace-dashboard)). Detalle por punto en [03 - MVP](docs/03-mvp.md#estado-2026-09-30).
 
 ## Desarrollo
 
@@ -18,6 +18,7 @@ cp .env.example .env.local
 npm run db:start       # Supabase local y aplica las migraciones (Studio en http://127.0.0.1:54323)
 npm run sync:catalogo  # carga catálogo, precios de Scryfall y de Card Kingdom (~25 s, ~120 MB)
 npm run seed           # tiendas, jugadores, listas y ofertas de prueba (ver docs/08)
+npm run staff -- agregar <correo> owner  # quién revisa tiendas en /tiendas (owner o moderator)
 npm run dev            # servidor de desarrollo de Next.js
                        # los correos de login llegan a Mailpit: http://127.0.0.1:54324
 npm test               # pruebas (vitest)

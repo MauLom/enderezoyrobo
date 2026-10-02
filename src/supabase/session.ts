@@ -9,6 +9,8 @@ export type Profile = {
   displayName: string;
   kind: "player" | "seller" | "store";
   deliveryZone: string | null;
+  /** Owner o moderador de la plataforma (tabla staff); null para todos los demás. */
+  staffRole: "owner" | "moderator" | null;
 };
 
 /**
@@ -23,7 +25,7 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
 
   const { data, error } = await supabase
     .from("profile")
-    .select("id, display_name, kind, delivery_zone")
+    .select("id, display_name, kind, delivery_zone, staff(role)")
     .eq("id", userId)
     .maybeSingle();
   if (error) throw error;
@@ -36,6 +38,7 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
     displayName: data.display_name,
     kind: data.kind,
     deliveryZone: data.delivery_zone,
+    staffRole: data.staff?.role === "owner" || data.staff?.role === "moderator" ? data.staff.role : null,
   };
 });
 

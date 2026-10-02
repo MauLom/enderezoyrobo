@@ -8,10 +8,13 @@ import { getShellCounts } from "@/supabase/shell";
  */
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const profile = await getCurrentProfile();
-  const counts = await getShellCounts(profile?.id ?? null);
+  const counts = await getShellCounts(profile);
+  const user = profile
+    ? { displayName: profile.displayName, email: profile.email, kind: profile.kind, isStaff: profile.staffRole !== null }
+    : null;
 
   return (
-    <AppShell user={profile ? { displayName: profile.displayName, email: profile.email, kind: profile.kind } : null} counts={counts}>
+    <AppShell user={user} counts={counts}>
       {children}
     </AppShell>
   );

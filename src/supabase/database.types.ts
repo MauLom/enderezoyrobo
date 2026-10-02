@@ -206,6 +206,25 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"staff": {
+                  Row: {
+                    "created_at": string,"profile_id": string,"role": string
+                  }
+                  Insert: {
+                    "created_at"?: string,"profile_id": string,"role": string
+                  }
+                  Update: {
+                    "created_at"?: string,"profile_id"?: string,"role"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "staff_profile_id_fkey"
+      columns: ["profile_id"]
+isOneToOne: true
+      referencedRelation: "profile"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"store": {
                   Row: {
                     "address": string | null,"created_at": string,"id": string,"inventory_updated_at": string | null,"name": string,"price_reference_note": string | null,"profile_id": string,"verified_at": string | null,"whatsapp": string | null
@@ -222,6 +241,31 @@ isOneToOne: false
       columns: ["profile_id"]
 isOneToOne: true
       referencedRelation: "profile"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"store_rejection": {
+                  Row: {
+                    "reason": string,"rejected_at": string,"rejected_by": string | null,"store_id": string
+                  }
+                  Insert: {
+                    "reason": string,"rejected_at"?: string,"rejected_by"?: string | null,"store_id": string
+                  }
+                  Update: {
+                    "reason"?: string,"rejected_at"?: string,"rejected_by"?: string | null,"store_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "store_rejection_rejected_by_fkey"
+      columns: ["rejected_by"]
+isOneToOne: false
+      referencedRelation: "profile"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "store_rejection_store_id_fkey"
+      columns: ["store_id"]
+isOneToOne: true
+      referencedRelation: "store"
       referencedColumns: ["id"]
     }
                   ]
@@ -288,6 +332,12 @@ isOneToOne: false
 "crear_oferta":
 { Args: { "items": Json,"lista": string,"mensaje": string,"total": number }; Returns: string
                            },
+"es_staff":
+{ Args: Record<PropertyKey, never>; Returns: boolean
+                           },
+"exigir_staff":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "inventario_cumple":
 { Args: { "i": Database["public"]['Tables']["inventory_item"]['Row'],"i_oracle_id": string,"w": Database["public"]['Tables']["want_list_item"]['Row'] }; Returns: boolean
                            },
@@ -306,6 +356,12 @@ isOneToOne: false
               "foil": Database["public"]['Enums']["foil_preference"],"item_id": string,"language": string,"list_name": string,"list_updated_at": string,"min_condition": Database["public"]['Enums']["card_condition"],"oracle_id": string,"owner_name": string,"printing_id": string,"quantity": number,"want_list_id": string
             }[]
                            },
+"quitar_verificacion":
+{ Args: { "tienda": string }; Returns: undefined
+                           },
+"rechazar_tienda":
+{ Args: { "motivo": string,"tienda": string }; Returns: undefined
+                           },
 "resumen_cartas":
 { Args: { "oracle_ids": (string)[] }; Returns: {
               "ck_min": number,"eur_min": number,"image_uri": string,"name": string,"oracle_id": string,"set_code": string,"usd_min": number
@@ -316,6 +372,14 @@ isOneToOne: false
                            },
 "show_trgm":
 { Args: { "": string }; Returns: (string)[]
+                           },
+"tiendas_para_revisar":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "address": string,"created_at": string,"id": string,"inventory_count": number,"name": string,"owner_email": string,"owner_name": string,"price_reference_note": string,"rejected_at": string,"rejection_reason": string,"verified_at": string,"whatsapp": string
+            }[]
+                           },
+"verificar_tienda":
+{ Args: { "tienda": string }; Returns: undefined
                            },
 "whatsapp_de_mis_tratos":
 { Args: Record<PropertyKey, never>; Returns: {
