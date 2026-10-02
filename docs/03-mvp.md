@@ -22,7 +22,7 @@ El MVP responde una sola pregunta: ¿qué tiendas de Monterrey tienen las cartas
 | 4 | Matching | Listo | Cobertura por vendedor y mejor combinación, con pedido armado por WhatsApp. |
 | 5 | Precios de referencia en MXN | Parcial | En el detalle de lista se muestran TCGplayer y Card Kingdom (USD, no foil) convertidos a MXN; CK se sincroniza a diario desde MTGJSON (#19). Falta Cardmarket (ya está en la base, no se muestra; #18). |
 | 6 | Listas públicas y ofertas | Listo | Hacer pública una lista y copiar su enlace funciona. Reglas de la oferta en `src/lib/offers/` (armar, validar, cambios de estado) y tabla `offer` con su trigger listos; el seed trae ofertas. En `/listas/<id>` de una lista pública ajena, un vendedor o tienda hace una oferta por el lote: propuesta armada desde su inventario, cantidades y total ajustables y mensaje (#23); un jugador ve la invitación a cambiar a vendedor. "Ofertas" en el menú (`/ofertas`, con el número de recibidas por responder): recibidas y enviadas; el dueño acepta o rechaza, el vendedor retira, solo mientras está pendiente; al aceptar, cada uno ve el WhatsApp del otro y puede calificarlo (#24). |
-| 7 | "Inventario actualizado hace X días" | Listo | Se marca en ámbar después de 30 días. |
+| 7 | "Inventario actualizado hace X días" | Listo | Se marca en ámbar después de 30 días (`isInventoryStale`), en "Dónde conseguirlas" y en la página pública de cada tienda (`/tiendas/<id>`, #7): nombre, insignia, dirección, referencia de precio, WhatsApp y sus cartas con el grid del marketplace. Se ve sin sesión y se llega desde el modal de ofertas y desde "Dónde conseguirlas". |
 
 ## Marketplace (`/dashboard`)
 

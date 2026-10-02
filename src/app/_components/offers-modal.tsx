@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { noContactLabel } from "@/lib/contact/seller-contact";
 import { orderMessage, whatsappLink } from "@/lib/contact/whatsapp";
 import { type CardListing, initials, type MarketOffer } from "@/lib/marketplace/listings";
@@ -56,7 +57,16 @@ export function OffersModal({ listing, onClose }: { listing: CardListing; onClos
               <div className="offer-row" key={offer.id}>
                 <div className={`activity-avatar ${accent(offer.sellerId)}`}>{initials(offer.sellerName)}</div>
                 <div>
-                  <strong>{offer.sellerName}{offer.verified ? " ✓" : ""}</strong>
+                  <strong>
+                    {offer.isStore ? (
+                      <Link href={`/tiendas/${offer.sellerId}`} className="transition hover:text-accent-soft">
+                        {offer.sellerName}
+                      </Link>
+                    ) : (
+                      offer.sellerName
+                    )}
+                    {offer.verified ? " ✓" : ""}
+                  </strong>
                   <span>{offerDetail(offer)} · {offer.quantity} disp.{offer.location ? ` · ${offer.location}` : ""}</span>
                 </div>
                 <b>{formatMxn(offer.priceMxnCents)}</b>

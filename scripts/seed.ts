@@ -309,7 +309,8 @@ async function seed(tx: Tx) {
       const [{ id: storeId }] = await tx<{ id: string }[]>`
         insert into store (profile_id, name, address, whatsapp, price_reference_note, verified_at, inventory_updated_at, created_at)
         values (${ids[person.key]}, ${store.name}, ${store.address}, ${store.whatsapp}, ${store.priceNote},
-                ${store.verified ? tx`now()` : null}, now() - make_interval(days => ${store.updatedDaysAgo}),
+                ${store.verified ? tx`now()` : null},
+                ${INVENTORY[person.key] ? tx`now() - make_interval(days => ${store.updatedDaysAgo})` : null},
                 now() - make_interval(days => ${store.registeredDaysAgo ?? 60}))
         returning id`;
       if (store.rejection) {

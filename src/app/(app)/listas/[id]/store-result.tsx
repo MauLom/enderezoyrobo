@@ -1,11 +1,11 @@
+import Link from "next/link";
+import { SellerBadges } from "@/app/_components/seller-badges";
 import { ui } from "@/app/ui";
 import { orderMessage, whatsappLink } from "@/lib/contact/whatsapp";
 import type { MatchResult } from "@/lib/matching/match";
-import { daysAgoLabel, daysSince, formatMxn } from "@/lib/pricing/mxn";
+import { formatMxn } from "@/lib/pricing/mxn";
 import type { InventoryRow } from "@/supabase/inventory";
 import type { SellerInfo } from "./matching";
-
-const STALE_DAYS = 30;
 
 type Props = {
   result: MatchResult;
@@ -35,22 +35,22 @@ export function StoreResult({ result, seller, inventoryById }: Props) {
     formatMxn(result.totalMxnCents),
   );
   const link = seller.whatsapp ? whatsappLink(seller.whatsapp, message) : null;
-  const stale = daysSince(seller.inventoryUpdatedAt) > STALE_DAYS;
 
   return (
     <article className={`${ui.card} flex flex-col gap-4`}>
       <header className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h3 className={ui.h3}>{seller.sellerName}</h3>
-          <div className="mt-2 flex flex-wrap gap-1.5">
+          <h3 className={ui.h3}>
             {seller.isStore ? (
-              <span className={seller.verified ? ui.badgeAccent : ui.badge}>{seller.verified ? "✓ Tienda verificada" : "Tienda sin verificar"}</span>
+              <Link href={`/tiendas/${seller.sellerId}`} className="transition hover:text-accent-soft">
+                {seller.sellerName}
+              </Link>
             ) : (
-              <span className={ui.badge}>Vendedor</span>
+              seller.sellerName
             )}
-            <span className={stale ? ui.badgeWarn : ui.badge}>
-              Inventario actualizado {daysAgoLabel(seller.inventoryUpdatedAt)}
-            </span>
+          </h3>
+          <div className="mt-2">
+            <SellerBadges isStore={seller.isStore} verified={seller.verified} inventoryUpdatedAt={seller.inventoryUpdatedAt} />
           </div>
         </div>
         <div className="text-right">

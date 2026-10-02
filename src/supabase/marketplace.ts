@@ -9,7 +9,7 @@ import { createClient } from "./server";
 // las cartas que el usuario busca.
 const RECENT_LIMIT = 200;
 
-const OFFER_COLUMNS =
+export const OFFER_COLUMNS =
   "id, printing_id, condition, language, foil, quantity, price_mxn_cents, updated_at, seller_id, card_printing!inner(oracle_id, name, set_code, set_name, image_uri), profile(display_name, kind, store(name, verified_at, whatsapp, address, inventory_updated_at))";
 
 export type MarketplaceData = {
@@ -49,35 +49,56 @@ export async function getMarketplace(ownerId: string, { recent: withRecent = tru
     forWanted = data;
   }
 
-  const offers = [...(recent?.data ?? []), ...forWanted].map((r): MarketOffer => {
-    const store = r.profile?.store ?? null;
-    const isStore = r.profile?.kind === "store" && store !== null;
-    return {
-      id: r.id,
-      oracleId: r.card_printing.oracle_id,
-      printingId: r.printing_id,
-      cardName: r.card_printing.name,
-      setCode: r.card_printing.set_code,
-      setName: r.card_printing.set_name,
-      imageUri: r.card_printing.image_uri,
-      condition: r.condition,
-      language: r.language,
-      foil: r.foil,
-      quantity: r.quantity,
-      priceMxnCents: r.price_mxn_cents,
-      sellerId: r.seller_id,
-      sellerName: (isStore ? store?.name : null) ?? r.profile?.display_name ?? "Vendedor",
-      isStore,
-      verified: store?.verified_at != null,
-      whatsapp: sellerWhatsapp({ id: r.seller_id, isStore, storeWhatsapp: store?.whatsapp ?? null }, contacts),
-      location: store?.address ?? null,
-      updatedAt: (isStore ? store?.inventory_updated_at : null) ?? r.updated_at,
-    };
-  });
+  const offers = [...(recent?.data ?? []), ...forWanted].map((r) => toMarketOffer(r, contacts));
 
   return {
     listings: groupListings(offers, new Set(wantedIds)),
     wanted,
+  };
+}
+
+type OfferRow = {
+  id: string;
+  condition: MarketOffer["condition"];
+  language: string;
+  foil: boolean;
+  quantity: number;
+  price_mxn_cents: number;
+  updated_at: string;
+  seller_id: string;
+  printing_id: string;
+  card_printing: { oracle_id: string; name: string; set_code: string; set_name: string; image_uri: string | null };
+  profile: {
+    display_name: string;
+    kind: string;
+    store: { name: string; verified_at: string | null; whatsapp: string | null; address: string | null; inventory_updated_at: string | null } | null;
+  } | null;
+};
+
+/** Un renglón de inventario (consultado con OFFER_COLUMNS) como oferta del marketplace. */
+export function toMarketOffer(r: OfferRow, contacts: ReadonlyMap<string, string>): MarketOffer {
+  const store = r.profile?.store ?? null;
+  const isStore = r.profile?.kind === "store" && store !== null;
+  return {
+    id: r.id,
+    oracleId: r.card_printing.oracle_id,
+    printingId: r.printing_id,
+    cardName: r.card_printing.name,
+    setCode: r.card_printing.set_code,
+    setName: r.card_printing.set_name,
+    imageUri: r.card_printing.image_uri,
+    condition: r.condition,
+    language: r.language,
+    foil: r.foil,
+    quantity: r.quantity,
+    priceMxnCents: r.price_mxn_cents,
+    sellerId: r.seller_id,
+    sellerName: (isStore ? store?.name : null) ?? r.profile?.display_name ?? "Vendedor",
+    isStore,
+    verified: store?.verified_at != null,
+    whatsapp: sellerWhatsapp({ id: r.seller_id, isStore, storeWhatsapp: store?.whatsapp ?? null }, contacts),
+    location: store?.address ?? null,
+    updatedAt: (isStore ? store?.inventory_updated_at : null) ?? r.updated_at,
   };
 }
 
