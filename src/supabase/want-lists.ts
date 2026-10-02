@@ -102,6 +102,8 @@ export type WantListItemView = {
   language: string | null;
   /** Precio de referencia más bajo (TCGplayer, no foil) entre las impresiones aceptadas. */
   referenceUsd: string | null;
+  /** Lo mismo con Card Kingdom (MTGJSON). */
+  referenceCkUsd: string | null;
 };
 
 
@@ -140,7 +142,8 @@ export async function getWantListDetail(id: string): Promise<WantListDetail | nu
   const items: WantListItemView[] = list.want_list_item.map((i) => {
     const summary = summaries.get(i.oracle_id);
     const exact = i.card_printing;
-    const exactUsd = exact?.price_reference.find((p) => p.source === "tcgplayer" && p.finish === "nonfoil")?.amount;
+    const exactPrice = (source: "tcgplayer" | "ck") =>
+      exact?.price_reference.find((p) => p.source === source && p.finish === "nonfoil")?.amount.toString() ?? null;
     return {
       id: i.id,
       oracleId: i.oracle_id,
@@ -152,7 +155,8 @@ export async function getWantListDetail(id: string): Promise<WantListDetail | nu
       minCondition: i.min_condition,
       foil: i.foil,
       language: i.language,
-      referenceUsd: exact ? (exactUsd?.toString() ?? null) : (summary?.usdMin ?? null),
+      referenceUsd: exact ? exactPrice("tcgplayer") : (summary?.usdMin ?? null),
+      referenceCkUsd: exact ? exactPrice("ck") : (summary?.ckMin ?? null),
     };
   });
   items.sort((a, b) => a.name.localeCompare(b.name));
@@ -169,12 +173,12 @@ export async function getWantListDetail(id: string): Promise<WantListDetail | nu
   };
 }
 
-type CardSummary = { name: string; imageUri: string | null; usdMin: string | null };
+type CardSummary = { name: string; imageUri: string | null; usdMin: string | null; ckMin: string | null };
 
 async function summarize(supabase: Client, oracleIds: string[]) {
   const rows = await fetchAll((from, to) => supabase.rpc("resumen_cartas", { oracle_ids: oracleIds }).range(from, to));
   return new Map<string, CardSummary>(
-    rows.map((r) => [r.oracle_id, { name: r.name, imageUri: r.image_uri, usdMin: r.usd_min?.toString() ?? null }]),
+    rows.map((r) => [r.oracle_id, { name: r.name, imageUri: r.image_uri, usdMin: r.usd_min?.toString() ?? null, ckMin: r.ck_min?.toString() ?? null }]),
   );
 }
 

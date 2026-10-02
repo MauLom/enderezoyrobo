@@ -10,7 +10,7 @@ import { formatForeign, formatMxn, toMxnCents } from "@/lib/pricing/mxn";
 import { getDealContacts } from "@/supabase/contacts";
 import { getMyOffersOnList } from "@/supabase/offers";
 import { getCurrentProfile } from "@/supabase/session";
-import { getWantListDetail, type WantListItemView } from "@/supabase/want-lists";
+import { getWantListDetail } from "@/supabase/want-lists";
 import { deleteItem, deleteList, renameList, setListPublic, updateItem } from "../actions";
 import { CopyLink } from "./copy-link";
 import { computeMatching, toInventoryItems, toWantItems } from "./matching";
@@ -57,9 +57,9 @@ export default async function ListaPage({ params }: PageProps<"/listas/[id]">) {
   const cardCount = list.items.reduce((sum, i) => sum + i.quantity, 0);
   const best = matching.best;
 
-  const referencePrice = (item: WantListItemView) => {
-    if (!item.referenceUsd) return "—";
-    return list.usdRate ? formatMxn(toMxnCents(item.referenceUsd, list.usdRate)) : formatForeign(item.referenceUsd, "USD");
+  const referencePrice = (usd: string | null) => {
+    if (!usd) return "—";
+    return list.usdRate ? formatMxn(toMxnCents(usd, list.usdRate)) : formatForeign(usd, "USD");
   };
 
   return (
@@ -171,7 +171,7 @@ export default async function ListaPage({ params }: PageProps<"/listas/[id]">) {
             <div>
               <h2>Cartas</h2>
               <span>
-                Referencia: lo más bajo en TCGplayer entre las impresiones que aceptas
+                Referencia: lo más bajo en TCGplayer y Card Kingdom (CK) entre las impresiones que aceptas, no foil
                 {list.usdRate ? ", en pesos" : " (en dólares: aún no hay tipo de cambio)"}
               </span>
             </div>
@@ -201,8 +201,13 @@ export default async function ListaPage({ params }: PageProps<"/listas/[id]">) {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[13px] font-extrabold text-accent">{referencePrice(item)}</p>
-                    <p className="text-[10px] text-muted">referencia</p>
+                    <p className="text-[13px] font-extrabold text-accent">{referencePrice(item.referenceUsd)}</p>
+                    <p className="text-[10px] text-muted">TCGplayer</p>
+                    {item.referenceCkUsd && (
+                      <p className="mt-1 text-[11px] font-bold">
+                        {referencePrice(item.referenceCkUsd)} <span className="text-[10px] font-normal text-muted">CK</span>
+                      </p>
+                    )}
                   </div>
                   {isOwner && (
                     <details className="relative">
