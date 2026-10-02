@@ -58,6 +58,8 @@ El esquema implementado está en `supabase/migrations/` y manda sobre este resum
 
 ## Marketplace
 
+La página pública de cada tienda (`/tiendas/<id>`, con el id de su perfil) usa la misma conversión (`toMarketOffer`) solo con su inventario (`getPublicStore` en `src/supabase/stores.ts`).
+
 `/dashboard` muestra el inventario agrupado por carta (`src/lib/marketplace/listings.ts`). `src/supabase/marketplace.ts` trae las 200 ofertas más recientes con existencias, más todas las de las cartas que el usuario tiene en sus want lists, con los datos del vendedor y de su tienda. `/listas` usa la misma consulta solo con las cartas buscadas. El conteo de ofertas ahí y en el panel "Tu wishlist" aplica las mismas reglas que el matching de `/listas/<id>` (`matchesWant`).
 
 ## Reglas de matching

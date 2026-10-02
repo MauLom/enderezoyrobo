@@ -1,5 +1,7 @@
 import "server-only";
 import { storeStatus, type StoreStatus } from "@/lib/account/store";
+import { type CardListing, groupListings } from "@/lib/marketplace/listings";
+import { OFFER_COLUMNS, toMarketOffer } from "./marketplace";
 import { createClient } from "./server";
 
 export type MyStore = {
@@ -74,4 +76,48 @@ export async function countPendingStores(): Promise<number> {
   const { data, error } = await supabase.from("store").select("id, store_rejection(store_id)").is("verified_at", null);
   if (error) throw error;
   return data.filter((s) => !s.store_rejection).length;
+}
+
+export type PublicStore = {
+  sellerId: string;
+  name: string;
+  address: string | null;
+  whatsapp: string | null;
+  priceReferenceNote: string | null;
+  verified: boolean;
+  inventoryUpdatedAt: string | null;
+  listings: CardListing[];
+};
+
+/**
+ * Página pública de una tienda (/tiendas/<id>, con el id de su perfil): datos
+ * de la tienda y su inventario agrupado por carta. Null si no existe. Todo es
+ * de lectura pública, así que funciona sin sesión.
+ */
+export async function getPublicStore(sellerId: string): Promise<PublicStore | null> {
+  const supabase = await createClient();
+  const [store, inventory] = await Promise.all([
+    supabase
+      .from("store")
+      .select("profile_id, name, address, whatsapp, price_reference_note, verified_at, inventory_updated_at")
+      .eq("profile_id", sellerId)
+      .maybeSingle(),
+    supabase.from("inventory_item").select(OFFER_COLUMNS).eq("seller_id", sellerId).gt("quantity", 0),
+  ]);
+  if (store.error) throw store.error;
+  if (inventory.error) throw inventory.error;
+  if (!store.data) return null;
+
+  // El WhatsApp de una tienda es público: no hacen falta los contactos de tratos.
+  const offers = inventory.data.map((r) => toMarketOffer(r, new Map()));
+  return {
+    sellerId: store.data.profile_id,
+    name: store.data.name,
+    address: store.data.address,
+    whatsapp: store.data.whatsapp,
+    priceReferenceNote: store.data.price_reference_note,
+    verified: store.data.verified_at !== null,
+    inventoryUpdatedAt: store.data.inventory_updated_at,
+    listings: groupListings(offers).sort((a, b) => a.name.localeCompare(b.name)),
+  };
 }

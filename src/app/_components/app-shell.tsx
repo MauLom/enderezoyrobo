@@ -30,7 +30,7 @@ export function AppShell({ user, counts, children }: Props) {
     ? "listas"
     : pathname.startsWith("/ofertas")
       ? "ofertas"
-      : pathname.startsWith("/tiendas")
+      : pathname === "/tiendas"
         ? "tiendas"
         : pathname === "/dashboard"
           ? "marketplace"

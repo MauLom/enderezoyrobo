@@ -35,6 +35,14 @@ export function daysSince(date: Date | string, now: Date = new Date()): number {
   return Math.floor((now.getTime() - new Date(date).getTime()) / 86_400_000);
 }
 
+/** A partir de cuántos días el inventario se marca como viejo (aviso en ámbar). */
+export const STALE_INVENTORY_DAYS = 30;
+
+/** El inventario lleva más de STALE_INVENTORY_DAYS días sin actualizarse. */
+export function isInventoryStale(updatedAt: Date | string, now: Date = new Date()): boolean {
+  return daysSince(updatedAt, now) > STALE_INVENTORY_DAYS;
+}
+
 /** "hoy", "ayer", "hace 10 días". */
 export function daysAgoLabel(date: Date | string, now: Date = new Date()): string {
   const days = daysSince(date, now);
