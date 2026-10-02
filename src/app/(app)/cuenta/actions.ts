@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { validateSelfKind } from "@/lib/account/kind";
+import { type StoreInput, validateStore } from "@/lib/account/store";
 import { validateDeliveryZone, validateDisplayName, validateWhatsapp } from "@/lib/account/validation";
 import { createClient } from "@/supabase/server";
 import { requireProfile } from "@/supabase/session";
@@ -73,6 +74,42 @@ export async function updateKind(_prev: KindState, formData: FormData): Promise<
 
   revalidatePath("/", "layout");
   return {};
+}
+
+export type StoreState = { values: StoreInput; error?: string; saved?: boolean };
+
+/**
+ * Registra la tienda del usuario o actualiza sus datos. Al registrarla, el
+ * trigger al_registrar_tienda pone el perfil como 'store'; queda pendiente
+ * hasta que el staff la revise en /tiendas. Corregir los datos de una tienda
+ * rechazada la manda otra vez a revisión (trigger al_editar_tienda).
+ */
+export async function saveStore(_prev: StoreState, formData: FormData): Promise<StoreState> {
+  const profile = await requireProfile();
+  const raw = {
+    name: String(formData.get("name") ?? ""),
+    address: String(formData.get("address") ?? ""),
+    whatsapp: String(formData.get("whatsapp") ?? ""),
+    priceReferenceNote: String(formData.get("priceReferenceNote") ?? ""),
+  };
+  const store = validateStore(raw);
+  if (!store.ok) return { values: { ...raw, priceReferenceNote: raw.priceReferenceNote || null }, error: store.error };
+
+  const row = {
+    name: store.value.name,
+    address: store.value.address,
+    whatsapp: store.value.whatsapp,
+    price_reference_note: store.value.priceReferenceNote,
+  };
+  const supabase = await createClient();
+  const { data: existing } = await supabase.from("store").select("id").eq("profile_id", profile.id).maybeSingle();
+  const { error } = existing
+    ? await supabase.from("store").update(row).eq("id", existing.id)
+    : await supabase.from("store").insert({ ...row, profile_id: profile.id });
+  if (error) return { values: store.value, error: "No pudimos guardar la tienda. Intenta de nuevo." };
+
+  revalidatePath("/", "layout");
+  return { values: store.value, saved: true };
 }
 
 export async function signOut() {
