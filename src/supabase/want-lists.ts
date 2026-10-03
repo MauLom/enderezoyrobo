@@ -1,9 +1,10 @@
 import "server-only";
 import type { Condition } from "@/lib/cards/condition";
-import { type CatalogPrinting, namesToLookup, type ResolveResult, resolveLines } from "@/lib/catalog/resolve";
+import { namesToLookup, type ResolveResult, resolveLines } from "@/lib/catalog/resolve";
 import { looksLikeCollectionCsv, parseCollectionCsv } from "@/lib/import/collection-csv";
 import { type LineError, parseDecklist } from "@/lib/import/decklist";
 import type { FoilPreference } from "@/lib/matching/match";
+import { findPrintings } from "./catalog";
 import { type InventoryRow, toInventoryRow } from "./inventory";
 import { type Client, fetchAll } from "./query";
 import { createClient } from "./server";
@@ -18,19 +19,7 @@ export async function resolveDecklist(text: string): Promise<ResolvedDecklist> {
   const names = namesToLookup(lines);
   if (names.length === 0) return { items: [], warnings: [], unresolved: [], parseErrors: errors };
 
-  const supabase = await createClient();
-  const rows = await fetchAll((from, to) => supabase.rpc("buscar_impresiones", { nombres: names }).range(from, to));
-  const candidates: CatalogPrinting[] = rows.map((r) => ({
-    id: r.id,
-    oracleId: r.oracle_id,
-    name: r.name,
-    setCode: r.set_code,
-    setName: r.set_name,
-    collectorNumber: r.collector_number,
-    lang: r.lang,
-    imageUri: r.image_uri,
-    releasedAt: r.released_at,
-  }));
+  const candidates = await findPrintings(names);
   return { ...resolveLines(lines, candidates), parseErrors: errors };
 }
 

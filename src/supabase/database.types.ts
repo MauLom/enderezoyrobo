@@ -365,6 +365,9 @@ isOneToOne: false
 "rechazar_tienda":
 { Args: { "motivo": string,"tienda": string }; Returns: undefined
                            },
+"reemplazar_inventario":
+{ Args: { "items": Json }; Returns: number
+                           },
 "resumen_cartas":
 { Args: { "oracle_ids": (string)[] }; Returns: {
               "ck_min": number,"eur_min": number,"image_uri": string,"name": string,"oracle_id": string,"set_code": string,"usd_min": number

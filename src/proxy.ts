@@ -5,7 +5,7 @@ import { updateSession } from "@/supabase/proxy";
 // verificar con requireProfile, y RLS protege los datos. /listas/[id] y
 // /tiendas/[id] no están: las listas públicas y las tiendas se ven sin sesión.
 const PROTECTED_PREFIXES = ["/cuenta"];
-const PROTECTED_EXACT = ["/listas", "/listas/nueva", "/dashboard", "/tiendas"];
+const PROTECTED_EXACT = ["/listas", "/listas/nueva", "/dashboard", "/tiendas", "/inventario"];
 
 export async function proxy(request: NextRequest) {
   const { response, userId } = await updateSession(request);

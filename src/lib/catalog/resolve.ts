@@ -55,11 +55,12 @@ function frontFace(name: string): string {
 }
 
 /** Nombres a buscar en el catálogo para estas líneas. */
-export function namesToLookup(lines: ParsedLine[]): string[] {
+export function namesToLookup(lines: { name: string }[]): string[] {
   return [...new Set(lines.map((line) => normalizeCardName(line.name)))];
 }
 
-export function resolveLines(lines: ParsedLine[], candidates: CatalogPrinting[]): ResolveResult {
+/** Impresiones por nombre normalizado, también por la cara frontal ("Delver of Secrets"). */
+export function indexByName(candidates: CatalogPrinting[]): Map<string, CatalogPrinting[]> {
   const byName = new Map<string, CatalogPrinting[]>();
   for (const printing of candidates) {
     for (const key of new Set([normalizeCardName(printing.name), frontFace(printing.name)])) {
@@ -68,6 +69,20 @@ export function resolveLines(lines: ParsedLine[], candidates: CatalogPrinting[])
       byName.set(key, list);
     }
   }
+  return byName;
+}
+
+/**
+ * Impresiones de la carta que corresponde a un nombre. Si varias cartas se
+ * llaman igual (una carta y su ficha), gana la que tiene más impresiones.
+ */
+export function printingsOfCard(matches: CatalogPrinting[]): CatalogPrinting[] {
+  const oracleId = mostPrinted(matches);
+  return matches.filter((p) => p.oracleId === oracleId);
+}
+
+export function resolveLines(lines: ParsedLine[], candidates: CatalogPrinting[]): ResolveResult {
+  const byName = indexByName(candidates);
 
   const items = new Map<string, ResolvedItem>();
   const warnings: ResolveIssue[] = [];
@@ -80,8 +95,8 @@ export function resolveLines(lines: ParsedLine[], candidates: CatalogPrinting[])
       continue;
     }
 
-    const oracleId = mostPrinted(matches);
-    const printings = matches.filter((p) => p.oracleId === oracleId);
+    const printings = printingsOfCard(matches);
+    const oracleId = printings[0].oracleId;
 
     let exact: CatalogPrinting | null = (line.scryfallId && printings.find((p) => p.id === line.scryfallId)) || null;
     if (!exact && line.setCode) {
@@ -128,7 +143,8 @@ function mostPrinted(printings: CatalogPrinting[]): string {
   return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
 }
 
-function newestEnglish(printings: CatalogPrinting[]): CatalogPrinting {
+/** La impresión más reciente en inglés y con imagen. */
+export function newestEnglish(printings: CatalogPrinting[]): CatalogPrinting {
   const score = (p: CatalogPrinting) => [p.lang === "en" ? 1 : 0, p.imageUri ? 1 : 0, p.releasedAt ?? ""] as const;
   return [...printings].sort((a, b) => {
     const [la, ia, ra] = score(a);

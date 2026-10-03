@@ -112,6 +112,11 @@ export function AppShell({ user, counts, children }: Props) {
           {user && (
             <>
               <div className="nav-label">Cuenta</div>
+              {user.kind !== "player" && (
+                <Link href="/inventario" className={`nav-item ${pathname === "/inventario" ? "active" : ""}`}>
+                  <Icon name="box" size={19} /><span>Mi inventario</span>
+                </Link>
+              )}
               <Link href="/cuenta" className={`nav-item ${pathname === "/cuenta" ? "active" : ""}`}>
                 <Icon name="user" size={19} /><span>Mi perfil</span>
               </Link>
