@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Icon } from "@/app/_components/icon";
 import { PageHeader } from "@/app/_components/page-header";
 import { ui } from "@/app/ui";
@@ -66,10 +67,10 @@ export default async function CuentaPage() {
             </div>
             <span className={ui.badgeAccent}>{ACCOUNT_KINDS[profile.kind].label}</span>
           </div>
-          {profile.kind === "seller" && (
-            <p className={ui.muted}>
-              Pronto podrás cargar las cartas que vendes en &quot;Mi inventario&quot;.
-            </p>
+          {profile.kind !== "player" && (
+            <Link href="/inventario" className={`${ui.link} self-start text-xs`}>
+              Cargar las cartas que vendes en Mi inventario
+            </Link>
           )}
           {profile.kind !== "store" && <KindForm kind={profile.kind} />}
         </section>
