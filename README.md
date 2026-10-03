@@ -19,6 +19,7 @@ npm run db:start       # Supabase local y aplica las migraciones (Studio en http
 npm run sync:catalogo  # carga catálogo, precios de Scryfall y de Card Kingdom (~25 s, ~120 MB)
 npm run seed           # tiendas, jugadores, listas y ofertas de prueba (ver docs/08)
 npm run staff -- agregar <correo> owner  # quién revisa tiendas en /tiendas (owner o moderator)
+npm run tienda:verificar                 # tiendas por revisar; con -- <correo> [--quitar] verifica (ver docs/09)
 npm run dev            # servidor de desarrollo de Next.js
                        # los correos de login llegan a Mailpit: http://127.0.0.1:54324
 npm test               # pruebas (vitest)
@@ -72,5 +73,6 @@ Con Podman, exporta antes `DOCKER_HOST=unix:///run/user/$UID/podman/podman.sock`
 | [06 - Decisiones abiertas](docs/06-decisiones-abiertas.md) | Nombre, stack, autenticación, identidad visual, oferta de lanzamiento, pendientes |
 | [07 - Datos y fuentes](docs/07-datos-y-fuentes.md) | Scryfall, MTGJSON, sincronización, formatos de importación, marketplace, modelo de datos |
 | [08 - Validación](docs/08-validacion.md) | Datos de prueba, casos que cubren y cómo probar contra Supabase en la nube |
+| [09 - Verificación de tiendas](docs/09-verificacion-de-tiendas.md) | Qué revisar antes de dar la insignia, cuándo quitarla y cómo hacerlo (`/tiendas` o `npm run tienda:verificar`) |
 
 Documento vivo original (con diagrama del plan): https://claude.ai/code/artifact/8c6fb82b-abaa-4fdd-96ce-bc890b71677d

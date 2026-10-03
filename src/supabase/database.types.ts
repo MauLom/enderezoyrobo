@@ -338,6 +338,9 @@ isOneToOne: false
 "exigir_staff":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
+"fijar_verificacion":
+{ Args: { "tienda": string,"verificada": boolean }; Returns: undefined
+                           },
 "inventario_cumple":
 { Args: { "i": Database["public"]['Tables']["inventory_item"]['Row'],"i_oracle_id": string,"w": Database["public"]['Tables']["want_list_item"]['Row'] }; Returns: boolean
                            },
